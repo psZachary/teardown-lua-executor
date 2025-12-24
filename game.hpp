@@ -24,32 +24,6 @@
     }
 
 namespace game {
-    struct td_string {
-        union {
-            char inline_buf[16];
-            char* heap_ptr;
-        };
-        uint64_t size;
-        uint64_t capacity;
-
-        const char* c_str() const {
-            bool is_heap = (capacity >> 56) != 0;
-            return is_heap ? heap_ptr : inline_buf;
-        }
-
-        std::string as_string() const {
-            return std::string(c_str(), size);
-        }
-
-        operator const char* () const {
-            return c_str();
-        }
-
-        operator std::string() const {
-            return as_string();
-        }
-    };
-
     static std::string read_string(uintptr_t pstring) {
         auto mem = memutil::c_mem::instance();
 
@@ -67,7 +41,7 @@ namespace game {
         }
         else {
             char buf[31]{'\0'};
-            mem->rpm(pstring, buf, 30);
+            mem->rpm(pstring, buf, 31);
             return std::string(buf);
         }
     }

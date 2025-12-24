@@ -316,7 +316,7 @@
                 div.className = "overflow-y-auto flex-1";
                 div.innerHTML = script_array.map(item => `
                 <div onclick='updateUsingScript(${item.index})' class="active:bg-indigo-700 transition duration-25 grid grid-cols-3 p-2 border-b border-gray-700 hover:bg-indigo-500">
-                    <span>${item.path}</span>
+                    <span class="select-text">${item.path}</span>
                     <span>${item.has_server && item.has_server ? "Local & Server" : item.has_server ? "Server" : "Local"}</span>
                     <span class="text-right">${item.index}</span>
                 </div>

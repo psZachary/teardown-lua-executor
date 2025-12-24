@@ -134,7 +134,7 @@ int main() {
     w.bind("cpp_update_script_index", [&](const std::string& req) -> std::string {
         nlohmann::json parsed_request = nlohmann::json::parse(req, nullptr, false);
         if (parsed_request.is_discarded()) return "";
-
+        std::cout << parsed_request.dump();
         // first argument passed from js
         int index = parsed_request[0].get<int>();
         g_using_script_index = index;

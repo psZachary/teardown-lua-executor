@@ -14,7 +14,7 @@ External Lua executor for Teardown using shellcode injection with a modern WebVi
 
 - **Node.js 18+** and npm
 - **Visual Studio 2022** with C++ desktop development tools
-- **WebView2 Runtime** (usually pre-installed on Windows 10/11)
+- [**WebView2 Runtime**](https://developer.microsoft.com/en-us/Microsoft-edge/webview2/?form=MA13LH#download) (usually pre-installed on Windows 10/11)
 - **Teardown** game
 
 ## Building
@@ -51,21 +51,23 @@ This will install the following packages:
 ## Project Structure
 ```
 teardown-lua-executor/
-├── webui/                  # Svelte UI source
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── CodeEditor.svelte
-│   │   │   ├── ScriptList.svelte
-│   │   │   ├── StatusBar.svelte
-│   │   │   └── Home.svelte
-│   │   ├── App.svelte
-│   │   └── main.js
-│   ├── package.json
-│   ├── vite.config.js
-│   └── tailwind.config.js
-├── src/                    # C++ source
-├── resources.rc
-└── README.md
+├── webui/                              # Svelte UI
+│   └── src/                            # UI Source
+│       ├── components/                 # UI Components (Tabs)
+│       │   ├── CodeEditor.svelte       # Code editor for the executor
+│       │   ├── Home.svelte             # Home page
+│       │   ├── ScriptList.svelte       # Provides current game scripts via IPC from C++
+│       │   └── StatusBar.svelte        # Status bar
+│       ├── app.css                     # Import TailwindCSS
+│       ├── app.svelte                  # Provides entry point & Webview2 IPC to components
+│       └── main.js 
+├── src/                                # C++ project functionality
+│   └── C++ Backend...
+├── resource/                           # C++ embeddable resources
+│   ├── resource.h
+│   └── resource.rc
+├── dependencies/                       # Libraries used in conjunction with C++ (Webview2, json, etc.)
+└── build/                              # Build output for executable (MSVC)
 ```
 
 ## Usage
@@ -106,7 +108,7 @@ The output in `webui/dist/index.html` will be embedded as a resource during the 
 - **WebView**: Microsoft WebView2
 
 ## License
-
+All source code in this project falls under the MIT license.
 [License](./LICENSE.txt)
 
 ## Disclaimer

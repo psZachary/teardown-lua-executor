@@ -14,7 +14,7 @@ External Lua executor for Teardown using shellcode injection with a modern WebVi
 
 - **Node.js 18+** and npm
 - **Visual Studio 2022** with C++ desktop development tools
-- **WebView2 Runtime** (usually pre-installed on Windows 10/11)
+- [**WebView2 Runtime**](https://developer.microsoft.com/en-us/Microsoft-edge/webview2/?form=MA13LH#download) (usually pre-installed on Windows 10/11)
 - **Teardown** game
 
 ## Building

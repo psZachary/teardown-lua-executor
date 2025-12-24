@@ -31,8 +31,9 @@ static std::string load_html_resource() {
     return std::string((char*)ptr, size);
 }
 
-static json build_game_structure() {
-    json result{};
+
+static json build_script_array() {
+    json result = json::array();
 
     game::c_context ctx = game::c_context::instance();
     if (!ctx.address) return result;
@@ -43,7 +44,6 @@ static json build_game_structure() {
     game::c_scripts_vector scripts = scene.scripts;
     if (!scripts.address || scripts.count <= 0) return result;
 
-    json scripts_array{};
     for (int i = 0; i < scripts.count; i++) {
         json script_object{};
 
@@ -54,26 +54,31 @@ static json build_game_structure() {
         script_object["path"] = script.resolved_path.c_str();
         script_object["has_client"] = (script.local_core.address ? true : false);
         script_object["has_server"] = (script.server_core.address ? true : false);
-        scripts_array.push_back(script_object);
+        result.push_back(script_object);
     }
 
-    result["scripts"] = scripts_array;
+    return result;
+}
+
+static json build_game_structure() {
+    json result = json::object();
+
+    result["scripts"] = build_script_array();
+    result["attached"] = c_mem::instance()->valid() && lua::g_initialized;
     return result;
 }
 
 static void update() {
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    for (;;) {
+        c_mem::instance()->attach("teardown.exe", PROCESS_ALL_ACCESS);
+        lua::initialize();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
 }
 
 int main() {
     c_mem::instance()->attach("teardown.exe", PROCESS_ALL_ACCESS);
-
-    if (!c_mem::instance()->valid())
-        return -1;
-
-    if (!lua::initialize())
-        return -2;
+    lua::initialize();
 
     webview::webview w(_DEBUG, nullptr);
     w.set_title("Teardown Lua Executor");

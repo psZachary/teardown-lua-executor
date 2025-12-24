@@ -32,6 +32,7 @@ namespace lua {
     extern tostring_t tolstring;
     extern type_t type;
     extern settop_t settop;
+    extern bool g_initialized;
 
     bool initialize();
 }

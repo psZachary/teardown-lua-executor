@@ -174,29 +174,39 @@ memutil::pattern_result memutil::c_mem::sig_scan(uintptr_t base, size_t size, co
 memutil::pattern_result memutil::c_mem::sig_scan(std::string module_name, const char* signature)
 {
     pattern_result out{ 0 };
+    if (!this->valid())
+        return out;
 
     uintptr_t base = this->get_module_base(module_name);
     if (!base) return out;
 
     memutil::section_info text{};
-
-    if (!get_section_info(base, ".text", &text))
+    if (!get_section_info(base, ".text", &text) || text.base <= 0 || text.size <= 0)
         return out;
 
     auto pattern = parse_signature(signature);
     if (pattern.empty()) return out;
 
+    // pattern larger than section
+    if (pattern.size() > text.size)
+        return out;
+
     constexpr size_t chunk_size = 0x10000;
     size_t overlap = pattern.size() - 1;
-
     std::vector<uint8_t> buffer(chunk_size);
+
     for (size_t offset = 0; offset < text.size;) {
         size_t to_read = min(chunk_size, text.size - offset);
-        if (!this->rpm(text.base + offset, buffer.data(), to_read)) {  
-            return out;
-        }
 
-        size_t scan_end = (offset + to_read >= text.size) ? to_read - pattern.size() + 1 : to_read - overlap;
+        // not enough bytes left to match pattern
+        if (to_read < pattern.size())
+            break;
+
+        if (!this->rpm(text.base + offset, buffer.data(), to_read))
+            return out;
+
+        bool is_last_chunk = (offset + to_read >= text.size);
+        size_t scan_end = is_last_chunk ? (to_read - pattern.size() + 1) : (to_read - overlap);
 
         for (size_t i = 0; i < scan_end; i++) {
             if (match_signature(&buffer[i], pattern)) {
@@ -204,8 +214,11 @@ memutil::pattern_result memutil::c_mem::sig_scan(std::string module_name, const 
                 return out;
             }
         }
-        offset += to_read - overlap;
+
+        size_t advance = to_read - overlap;
+        if (advance == 0) advance = 1;
+        offset += advance;
     }
     return out;
-};
+}
 

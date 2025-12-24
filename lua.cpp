@@ -10,6 +10,7 @@ lua::tostring_t lua::tolstring = nullptr;
 lua::type_t lua::type = nullptr;
 lua::settop_t lua::settop = nullptr;
 
+bool lua::g_initialized = false;
 
 bool lua::initialize()
 {
@@ -33,5 +34,6 @@ bool lua::initialize()
 	lua::settop = c_mem::instance()->sig_scan("Teardown.exe", "85 D2 78 ? 4C 8B 41 ? 4C 63 CA"
 	).get<lua::settop_t>();
 
-	return lua::getfield && lua::pushstring && lua::pcall && lua::type && lua::settop;
+	g_initialized = lua::getfield && lua::pushstring && lua::pcall && lua::type && lua::settop;
+	return g_initialized;
 }

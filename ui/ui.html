@@ -240,15 +240,13 @@
 <body class="bg-[#0a0a0a] h-full p-4 flex flex-col text-white select-none overflow-hidden">
 
     <div class="flex items-center gap-3 mb-4 shrink-0">
-        <div class="w-3 h-3 bg-indigo-500 rounded-full pulse"></div>
+        <div class="w-3 h-3 bg-indigo-500 rounded-full pulse" id="header_pulse"></div>
         <h1 class="text-xl font-bold text-white">Teardown Executor</h1>
     </div>
 
     <div class="flex border-b pb-2 border-gray-200/25 mb-2 shrink-0">
-        <button onclick="showTab(0)"
-            class="tab-btn px-4 py-2 border-b-2 border-indigo-500 text-indigo-600">Executor</button>
+        <button onclick="showTab(0)" class="tab-btn px-4 py-2 border-b-2 border-indigo-500 text-indigo-600">Executor</button>
         <button onclick="showTab(1)" class="tab-btn px-4 py-2 border-b-2 border-transparent">Script View</button>
-        <button onclick="showTab(2)" class="tab-btn px-4 py-2 border-b-2 border-transparent">Tab 3</button>
     </div>
     <!-- Tab content for Executor -->
     <div class="tab-content flex flex-col flex-1 min-h-0">
@@ -296,7 +294,15 @@
             }
         }
 
-        function updateScripts(script_array) {
+        function updateScripts(game_structure) {
+            if (game_structure == null || game_structure["attached"] == false) {
+                scriptsContainer = document.getElementById("script_container")
+                scriptsContainer.innerHTML = ""
+                return;
+            }
+
+            let script_array = game_structure["scripts"];
+
             script_array_json = JSON.stringify(script_array)
             if (script_array_json === lastScriptUpdate)
                 return;
@@ -319,6 +325,18 @@
             }
         }
 
+
+        function updateHeader(game_structure) {
+            headerPulseCircle = document.getElementById("header_pulse")
+
+            if (game_structure === null) {
+                headerPulseCircle.className = `w-3 h-3 ${"bg-rose-400"} rounded-full pulse`
+            }
+
+            attached = game_structure["attached"]
+            headerPulseCircle.className = `w-3 h-3 ${attached ? "bg-indigo-500" : "bg-rose-400"} rounded-full pulse`
+        }
+
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('DOMContentLoaded', function () {
             editor = CodeMirror.fromTextArea(document.getElementById('code'), {
@@ -335,12 +353,13 @@
 
             editor.setValue('-- Enter Lua code here...\n\nExplosion(GetPlayerPos(), 1)');
 
+            // pull game data from c++ important data like scripts, if our process is attached etc...
             setInterval(async () => {
+
                 let game_structure = await window.cpp_get_game_structure()
-                if (game_structure != null)
-                    if (game_structure["scripts"] != null)
-                        updateScripts(game_structure["scripts"])
-            }, 100);
+                updateScripts(game_structure)
+                updateHeader(game_structure)
+            }, 150);
         });
 
         function showStatus(msg, type = "success") {

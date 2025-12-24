@@ -61,12 +61,12 @@ namespace game {
             mem->rpm(pstring, &ptr, 8);
             if (!ptr) return "";
 
-            char buf[256]{};
+            char buf[256]{'\0'};
             mem->rpm(ptr, buf, 255);
             return std::string(buf);
         }
         else {
-            char buf[31]{};
+            char buf[31]{'\0'};
             mem->rpm(pstring, buf, 30);
             return std::string(buf);
         }
@@ -119,7 +119,8 @@ namespace game {
         PROPERTY_VALUE(data, uintptr_t, 0x8)
 
         c_script get(int index) const {
-            uintptr_t ptr = memutil::c_mem::instance()->read<uintptr_t>(data + 0x8 + (index * sizeof(uintptr_t)));
+            if (index >= count || !data || !count) return c_script(0);
+            uintptr_t ptr = memutil::c_mem::instance()->read<uintptr_t>(data + (index * sizeof(uintptr_t)));
             return c_script(ptr);
         }
 
@@ -140,13 +141,18 @@ namespace game {
         PROPERTY(scene, c_scene, 0x50)
 
         static c_context instance() {
+            static memutil::pattern_result result{0};
             game::c_context out{};
 
-            if (!memutil::c_mem::instance()->valid()) return out;
-
-            static memutil::pattern_result result =
-                memutil::c_mem::instance()->sig_scan("Teardown.exe",
+            if (!memutil::c_mem::instance()->valid()) {
+                result = memutil::pattern_result{ 0 };
+                return out;
+            }
+             
+            if (!result.get())
+                result = memutil::c_mem::instance()->sig_scan("Teardown.exe",
                     "48 8B 05 ? ? ? ? 48 8B 48 ? C6 44 24 ? ? C6 44 24 ? ? 48 8D 45");
+
             if (!result.get()) return out;
 
             if (!memutil::c_mem::instance()->rpm(result.rip<uintptr_t>(), &out.address, 8))

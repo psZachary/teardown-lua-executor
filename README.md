@@ -107,7 +107,7 @@ The output in `webui/dist/index.html` will be embedded as a resource during the 
 
 ## License
 
-[License](./LICENSE)
+[License](./LICENSE.txt)
 
 ## Disclaimer
 This tool is for educational purposes only. Use at your own risk.

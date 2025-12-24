@@ -206,6 +206,7 @@ npm run build</Command>
     <ClInclude Include="dependencies\webview\include\webview\types.hh" />
     <ClInclude Include="dependencies\webview\include\webview\version.h" />
     <ClInclude Include="dependencies\webview\include\webview\webview.h" />
+    <ClInclude Include="resource\resource.h" />
     <ClInclude Include="src\file_loader.hpp" />
     <ClInclude Include="src\game.hpp" />
     <ClInclude Include="src\lua.hpp" />
@@ -218,6 +219,9 @@ npm run build</Command>
     <ClCompile Include="src\lua_shellcode.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\memutil.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource\resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

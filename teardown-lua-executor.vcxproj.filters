@@ -50,6 +50,9 @@
     <Filter Include="source">
       <UniqueIdentifier>{ada12651-6b90-4940-a1c9-22b458340d79}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{188b040f-a343-4e57-88d0-563890c55b4e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\webview2\include\WebView2.h">
@@ -178,6 +181,9 @@
     <ClInclude Include="src\memutil.hpp">
       <Filter>header</Filter>
     </ClInclude>
+    <ClInclude Include="resource\resource.h">
+      <Filter>resource</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\file_loader.cpp">
@@ -195,5 +201,10 @@
     <ClCompile Include="src\memutil.cpp">
       <Filter>source</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource\resource.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

@@ -5,16 +5,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="source">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="ui">
-      <UniqueIdentifier>{d6145a82-3f9f-407a-ae6b-7b99fcb105bb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource">
-      <UniqueIdentifier>{1062025a-6214-4ff8-958e-6505e7f43718}</UniqueIdentifier>
-    </Filter>
     <Filter Include="dependencies">
       <UniqueIdentifier>{642f04c0-775c-4214-95ab-8582af18717d}</UniqueIdentifier>
     </Filter>
@@ -57,40 +47,11 @@
     <Filter Include="dependencies\json\include">
       <UniqueIdentifier>{25557cbf-613e-40e4-9a7f-0677df2a12b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{ada12651-6b90-4940-a1c9-22b458340d79}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="lua.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="memutil.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="lua_shellcode.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="file_loader.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="game.hpp">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="lua.hpp">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="memutil.hpp">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="resource\resource.h">
-      <Filter>resource</Filter>
-    </ClInclude>
-    <ClInclude Include="lua_shellcode.hpp">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="dependencies\webview2\include\WebView2.h">
       <Filter>dependencies\webview2\include</Filter>
     </ClInclude>
@@ -202,18 +163,37 @@
     <ClInclude Include="dependencies\json\include\json.hpp">
       <Filter>dependencies\json\include</Filter>
     </ClInclude>
-    <ClInclude Include="file_loader.hpp">
+    <ClInclude Include="src\file_loader.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua_shellcode.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\memutil.hpp">
       <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ui\ui.html">
-      <Filter>ui</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="resource\resource.rc">
-      <Filter>resource</Filter>
-    </ResourceCompile>
+    <ClCompile Include="src\file_loader.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lua_shellcode.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\memutil.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -4,7 +4,7 @@
 #include "game.hpp"
 #include "lua.hpp"
 #include "webview/webview.h"
-#include "resource/resource.h"
+#include "../resource/resource.h"
 #include "lua_shellcode.hpp"
 #include <json.hpp>
 #include "file_loader.hpp"

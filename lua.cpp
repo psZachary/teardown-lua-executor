@@ -7,8 +7,9 @@ lua::getfield_t lua::getfield = nullptr;
 lua::pushstring_t lua::pushstring = nullptr;
 lua::pcall_t lua::pcall = nullptr;
 lua::tostring_t lua::tolstring = nullptr;
-lua::setfield_t lua::setfield = nullptr;
-lua::createtable_t lua::createtable = nullptr;
+lua::type_t lua::type = nullptr;
+lua::settop_t lua::settop = nullptr;
+
 
 bool lua::initialize()
 {
@@ -26,5 +27,11 @@ bool lua::initialize()
 	lua::tolstring = c_mem::instance()->sig_scan("Teardown.exe", "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 49 8B D8 8B F2 48 8B F9 E8"
 	).get<lua::tostring_t>();
 
-	return lua::getfield && lua::pushstring && lua::pcall;
+	lua::type = c_mem::instance()->sig_scan("Teardown.exe", "48 83 EC ? E8 ? ? ? ? 48 8D 0D ? ? ? ? 48 3B C1 75"
+	).get<lua::type_t>();
+
+	lua::settop = c_mem::instance()->sig_scan("Teardown.exe", "85 D2 78 ? 4C 8B 41 ? 4C 63 CA"
+	).get<lua::settop_t>();
+
+	return lua::getfield && lua::pushstring && lua::pcall && lua::type && lua::settop;
 }

@@ -71,6 +71,9 @@
     <ClCompile Include="lua_shellcode.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="file_loader.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.hpp">
@@ -198,6 +201,9 @@
     </ClInclude>
     <ClInclude Include="dependencies\json\include\json.hpp">
       <Filter>dependencies\json\include</Filter>
+    </ClInclude>
+    <ClInclude Include="file_loader.hpp">
+      <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

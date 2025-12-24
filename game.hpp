@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdint>
 #include "memutil.hpp"
-#include "memutil.hpp"
+#include "lua.hpp"
 
 #define PROPERTY(name, type, offset) \
     __declspec(property(get = _get_##name)) type name; \
@@ -91,7 +91,7 @@ namespace game {
     class c_lua_wrapper : public c_base {
     public:
         using c_base::c_base;
-        PROPERTY(lua_state, c_lua_state, 0x0)
+        PROPERTY_VALUE(lua_state, lua::lua_state*, 0x0)
     };
 
     class c_script_core : public c_base {
@@ -108,6 +108,7 @@ namespace game {
 
         PROPERTY(local_core, c_script_core, 0x40)
         PROPERTY(server_core, c_script_core, 0x48)
+        PROPERTY_STRING(resolved_path, 0xA8)
     };
 
     class c_scripts_vector : public c_base {

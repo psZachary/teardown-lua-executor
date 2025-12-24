@@ -10,14 +10,16 @@
     prevents jump tables for each function (position dependent code).
 */
 
+int g_using_script_index = 0;
+
 __declspec(noinline)
 void __stdcall lua_execution_shellcode(lua_execution_data_t* data) {
-    // get loadstring function from _G (-10002)
+    // get loadstring
     data->lua_getfield(data->state, -10002, data->loadstring_field);
-    // push code onto stack
+    // push code
     data->lua_pushstring(data->state, data->code);
-    // compile loadstring
-    data->compile_error = data->lua_pcall(data->state, 1, 1, 0);
+    // call loadstring(code) -> returns function or nil, errmsg
+    data->compile_error = data->lua_pcall(data->state, 1, 2, 0);
 
     if (data->compile_error != 0) {
         const char* err = data->lua_tolstring(data->state, -1, nullptr);
@@ -32,7 +34,27 @@ void __stdcall lua_execution_shellcode(lua_execution_data_t* data) {
         return;
     }
 
-    // call compiled loadstring function
+    // check if first return is nil (compile failed)
+    int type = data->lua_type(data->state, -2);
+    if (type == 0) {  // LUA_TNIL
+        // error message is at -1
+        const char* err = data->lua_tolstring(data->state, -1, nullptr);
+        if (err) {
+            int i = 0;
+            while (err[i] && i < 255) {
+                data->error_msg[i] = err[i];
+                i++;
+            }
+            data->error_msg[i] = 0;
+        }
+        data->compile_error = -1;
+        return;
+    }
+
+    // pop error message (or nil), keep function
+    data->lua_settop(data->state, -2);
+
+    // call the compiled function
     data->run_error = data->lua_pcall(data->state, 0, 0, 0);
     if (data->run_error != 0) {
         const char* err = data->lua_tolstring(data->state, -1, nullptr);
@@ -47,35 +69,59 @@ void __stdcall lua_execution_shellcode(lua_execution_data_t* data) {
     }
 }
 
+void initialize_execution_data(
+    lua_execution_data_t& data,
+    lua::lua_state* state,
+    const std::string& code
+) {
+    const char* sz_loadstring_field = "loadstring";
+
+    // copy lua code to buffer in data
+    memcpy(data.code, code.data(), code.length() + 1);
+    // copy loadstring for lua_getfield usage
+    memcpy(data.loadstring_field, sz_loadstring_field, strlen(sz_loadstring_field) + 1);
+    // copy the pointers to the lua functions
+    data.lua_getfield = lua::getfield;
+    data.lua_pcall = lua::pcall;
+    data.lua_pushstring = lua::pushstring;
+    data.lua_tolstring = lua::tolstring;
+    data.lua_type = lua::type;
+    data.lua_settop = lua::settop;
+
+    // dynamic state grabbing TODO
+    data.state = (lua::lua_state*)state;
+}
+
 int execute_lua_remote_sync(const std::string& code) {
     lua_execution_data_t lua_exec_data{};
     void* remote_data = nullptr;
     void* remote_code = nullptr;
-    const char* sz_loadstring_field = "loadstring";
     game::c_context ctx{};
+    game::c_scene scene{};
+    game::c_scripts_vector scripts{};
+    game::c_script using_script{};
+    game::c_script_core using_core{};
 
     ctx = game::c_context::instance();
-    if (!ctx.address) return 1;
+    if (!ctx) return 1;
 
-    auto script = ctx.scene.scripts.get(4);
+    scene = ctx.scene;
+    if (!scene) return 2;
 
-    // copy lua code to buffer in data
-    memcpy(lua_exec_data.code, code.data(), code.length() + 1);
-    // copy loadstring for lua_getfield usage
-    memcpy(lua_exec_data.loadstring_field, sz_loadstring_field, strlen(sz_loadstring_field) + 1);
-    // copy the pointers to the lua functions
-    lua_exec_data.lua_getfield = lua::getfield;
-    lua_exec_data.lua_pcall = lua::pcall;
-    lua_exec_data.lua_pushstring = lua::pushstring;
-    lua_exec_data.lua_tolstring = lua::tolstring;
+    scripts = scene.scripts;
+    if (!scripts) return 3;
 
-    // dynamic state grabbing TODO
-    lua_exec_data.state = (lua::lua_state*)ctx.scene.scripts.get(2).server_core.lua_wrapper.lua_state.address;
+    using_script = scripts.get(g_using_script_index);
+    if (!using_script) return 4;
+
+    using_core = using_script.server_core;
+
+    initialize_execution_data(lua_exec_data, using_core.lua_wrapper.lua_state, code);
 
     // allocate data & shellcode
     remote_data = memutil::c_mem::instance()->alloc(nullptr, sizeof(lua_exec_data), MEM_COMMIT, PAGE_READWRITE);
     remote_code = memutil::c_mem::instance()->alloc(nullptr, 0x1000, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-    if (!remote_data || !remote_code) return 2;
+    if (!remote_data || !remote_code) return 5;
 
     // fill in data & shellcode
     memutil::c_mem::instance()->wpm(remote_data, &lua_exec_data, sizeof(lua_exec_data));
@@ -83,11 +129,11 @@ int execute_lua_remote_sync(const std::string& code) {
 
     // start the execution
     HANDLE thread = memutil::c_mem::instance()->create_remote_thread(nullptr, 0, remote_code, remote_data, 0, nullptr);
-    if (!thread) return 3;
+    if (!thread) return 6;
     
     // wait for shellcode to return
     if (memutil::c_mem::instance()->wait_for_single_object(thread, INFINITE) == WAIT_FAILED)
-        return 4;
+        return 7;
 
     lua_execution_data_t result{};
     memutil::c_mem::instance()->rpm(remote_data, &result, sizeof(result));
@@ -104,4 +150,5 @@ int execute_lua_remote_sync(const std::string& code) {
 
     // cleanup
     memutil::c_mem::instance()->close_handle(thread);
+    return 0;
 }

@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="file_loader.cpp" />
     <ClCompile Include="lua.cpp" />
     <ClCompile Include="lua_shellcode.cpp" />
     <ClCompile Include="memutil.cpp" />
@@ -200,6 +201,7 @@
     <ClInclude Include="dependencies\webview\include\webview\types.hh" />
     <ClInclude Include="dependencies\webview\include\webview\version.h" />
     <ClInclude Include="dependencies\webview\include\webview\webview.h" />
+    <ClInclude Include="file_loader.hpp" />
     <ClInclude Include="game.hpp" />
     <ClInclude Include="lua.hpp" />
     <ClInclude Include="lua_shellcode.hpp" />

@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="teardown-lua-executor.vcxproj" Id="cc8a8c77-a583-4cfe-aa6e-1ef0fb5702a0" />
+</Solution>

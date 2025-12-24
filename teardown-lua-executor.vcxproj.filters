@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="header">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ui">
+      <UniqueIdentifier>{d6145a82-3f9f-407a-ae6b-7b99fcb105bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{1062025a-6214-4ff8-958e-6505e7f43718}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies">
+      <UniqueIdentifier>{642f04c0-775c-4214-95ab-8582af18717d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\webview">
+      <UniqueIdentifier>{f65a0920-70e6-4936-9ef9-b646d9094550}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\webview2">
+      <UniqueIdentifier>{af3b4d32-acd3-4f58-87f4-a00143738dd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\webview2\include">
+      <UniqueIdentifier>{b2eff3bf-07b2-4910-9d6a-b0a2702ee491}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\webview\include">
+      <UniqueIdentifier>{a3bfe421-3e5b-4952-afba-3517f810b7cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\webview\include\webview">
+      <UniqueIdentifier>{dc084ae7-9fb8-43ee-b128-6907d61ca1a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\webview\include\webview\detail">
+      <UniqueIdentifier>{9d4adf4c-2771-404d-9c9f-e2c546c0ba25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\webview\include\webview\detail\platform">
+      <UniqueIdentifier>{30171ded-ab00-46b5-b46c-9284db55546f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\webview\include\webview\detail\platform\windows">
+      <UniqueIdentifier>{19728b0e-dda7-4a15-a087-1555f1dd1fc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\webview\include\webview\detail\platform\windows\webview2">
+      <UniqueIdentifier>{e92d7a22-b0e8-4b8d-8185-8a89b7ad6d80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\webview\include\webview\detail\backends">
+      <UniqueIdentifier>{2cf9b088-90d6-4ae2-a066-e3638aec1710}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\webview\include\webview\detail\utility">
+      <UniqueIdentifier>{cebcde37-59e0-4844-885d-768b1ce9e199}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\json">
+      <UniqueIdentifier>{f294c2d3-a2f9-41a6-906e-39424e86ff23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dependencies\json\include">
+      <UniqueIdentifier>{25557cbf-613e-40e4-9a7f-0677df2a12b2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="lua.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="memutil.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="lua_shellcode.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="game.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="lua.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="memutil.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="resource\resource.h">
+      <Filter>resource</Filter>
+    </ClInclude>
+    <ClInclude Include="lua_shellcode.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview2\include\WebView2.h">
+      <Filter>dependencies\webview2\include</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview2\include\WebView2EnvironmentOptions.h">
+      <Filter>dependencies\webview2\include</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview.h">
+      <Filter>dependencies\webview\include</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\api.h">
+      <Filter>dependencies\webview\include\webview</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\backends.hh">
+      <Filter>dependencies\webview\include\webview</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\c_api_impl.hh">
+      <Filter>dependencies\webview\include\webview</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\errors.h">
+      <Filter>dependencies\webview\include\webview</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\errors.hh">
+      <Filter>dependencies\webview\include\webview</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\json_deprecated.hh">
+      <Filter>dependencies\webview\include\webview</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\macros.h">
+      <Filter>dependencies\webview\include\webview</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\types.h">
+      <Filter>dependencies\webview\include\webview</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\types.hh">
+      <Filter>dependencies\webview\include\webview</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\version.h">
+      <Filter>dependencies\webview\include\webview</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\webview.h">
+      <Filter>dependencies\webview\include\webview</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\basic_result.hh">
+      <Filter>dependencies\webview\include\webview\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\engine_base.hh">
+      <Filter>dependencies\webview\include\webview\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\exceptions.hh">
+      <Filter>dependencies\webview\include\webview\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\json.hh">
+      <Filter>dependencies\webview\include\webview\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\native_library.hh">
+      <Filter>dependencies\webview\include\webview\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\optional.hh">
+      <Filter>dependencies\webview\include\webview\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\user_script.hh">
+      <Filter>dependencies\webview\include\webview\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\platform\windows\com_init_wrapper.hh">
+      <Filter>dependencies\webview\include\webview\detail\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\platform\windows\dpi.hh">
+      <Filter>dependencies\webview\include\webview\detail\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\platform\windows\dwmapi.hh">
+      <Filter>dependencies\webview\include\webview\detail\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\platform\windows\iid.hh">
+      <Filter>dependencies\webview\include\webview\detail\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\platform\windows\ntdll.hh">
+      <Filter>dependencies\webview\include\webview\detail\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\platform\windows\reg_key.hh">
+      <Filter>dependencies\webview\include\webview\detail\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\platform\windows\shcore.hh">
+      <Filter>dependencies\webview\include\webview\detail\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\platform\windows\theme.hh">
+      <Filter>dependencies\webview\include\webview\detail\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\platform\windows\user32.hh">
+      <Filter>dependencies\webview\include\webview\detail\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\platform\windows\version.hh">
+      <Filter>dependencies\webview\include\webview\detail\platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\platform\windows\webview2\loader.hh">
+      <Filter>dependencies\webview\include\webview\detail\platform\windows\webview2</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\backends\cocoa_webkit.hh">
+      <Filter>dependencies\webview\include\webview\detail\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\backends\gtk_webkitgtk.hh">
+      <Filter>dependencies\webview\include\webview\detail\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\backends\win32_edge.hh">
+      <Filter>dependencies\webview\include\webview\detail\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\webview\include\webview\detail\utility\string.hh">
+      <Filter>dependencies\webview\include\webview\detail\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\json\include\json.hpp">
+      <Filter>dependencies\json\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ui\ui.html">
+      <Filter>ui</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource\resource.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

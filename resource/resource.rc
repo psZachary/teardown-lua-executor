@@ -1,0 +1,2 @@
+#include "resource.h"
+IDR_UI_HTML RCDATA "./ui/ui.html"

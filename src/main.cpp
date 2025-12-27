@@ -107,9 +107,14 @@ int main() {
         nlohmann::json return_object{};
         return_object["error"] = "Success";
 
-        std::filesystem::path path = c_file_loader::load_file();
+        std::filesystem::path path = c_file_loader::load_lua_file();
         if (path.empty() || !std::filesystem::exists(path)) {
             return_object["error"] = "File not found";
+            return return_object.dump();
+        }
+
+        if (path.empty()) {
+            return_object["error"] = "No file chosen";
             return return_object.dump();
         }
 

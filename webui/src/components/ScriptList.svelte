@@ -4,7 +4,7 @@
 </script>
 
 <div class="flex flex-col flex-1 min-h-0">
-  <div class="grid grid-cols-3 p-2 border-b border-gray-700 text-indigo-600">
+  <div class="grid grid-cols-3 p-2 border-b border-gray-700 text-indigo-500">
     <span>Script Name</span>
     <span>Type</span>
     <span class="text-right">Index</span>

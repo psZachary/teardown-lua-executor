@@ -2,17 +2,16 @@
 #include <Windows.h>
 #include <iostream>
 
-std::string c_file_loader::load_file()
+std::string c_file_loader::load_lua_file()
 {
     OPENFILENAMEA ofn{};
     char file_buffer[260]{'\0'};
 
-    // Initialize OPENFILENAME
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = nullptr;
     ofn.lpstrFile = file_buffer;
     ofn.nMaxFile = sizeof(file_buffer);
-    ofn.lpstrFilter = "Lua Files\0*.LUA\0All\0*.*\0";
+    ofn.lpstrFilter = "Lua files (*.lua)\0*.lua;\0All files (*.*)\0*.*\0";
     ofn.nFilterIndex = 0;
     ofn.lpstrFileTitle = NULL;
     ofn.nMaxFileTitle = 0;

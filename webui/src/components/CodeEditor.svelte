@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
   import CodeMirror from 'codemirror';
   import 'codemirror/mode/lua/lua.js';
@@ -6,7 +6,7 @@
   
   export let on_execute = async (code) => {};
   export let on_load_file = async () => null;
-  
+  export let on_save_file = async (data: String) => null;
   let editor;
   let code_textarea;
   
@@ -41,10 +41,23 @@
     }
   }
   
+  async function save_file() {
+    const code = await on_save_file(editor.getValue());
+  }
+
   function clear_code() {
     editor.setValue('');
   }
+
+  async function key_handler(e: KeyboardEvent) {
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        await save_file();
+    }
+  }
 </script>
+
+<svelte:window onkeydown={key_handler}></svelte:window>
 
 <div class="flex flex-col h-full w-full">
   <div class="flex-1 bg-[#141414] rounded-sm p-2 border border-[#252525] mb-4 min-h-0 overflow-hidden">
@@ -59,6 +72,10 @@
     <button on:click={load_file}
       class="bg-[#1a1a1a] hover:bg-[#252525] text-gray-300 font-medium py-2 px-4 rounded-sm border border-[#252525]">
       Load File
+    </button>
+        <button on:click={save_file}
+      class="bg-[#1a1a1a] hover:bg-[#252525] text-gray-300 font-medium py-2 px-4 rounded-sm border border-[#252525]">
+      Save
     </button>
     <button on:click={clear_code}
       class="bg-[#1a1a1a] hover:bg-[#252525] text-gray-300 font-medium py-2 px-4 rounded-sm border border-[#252525]">

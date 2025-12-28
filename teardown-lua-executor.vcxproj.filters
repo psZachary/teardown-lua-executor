@@ -166,7 +166,7 @@
     <ClInclude Include="dependencies\json\include\json.hpp">
       <Filter>dependencies\json\include</Filter>
     </ClInclude>
-    <ClInclude Include="src\file_loader.hpp">
+    <ClInclude Include="src\file_helper.hpp">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="src\game.hpp">
@@ -186,7 +186,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\file_loader.cpp">
+    <ClCompile Include="src\file_helper.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="src\lua.cpp">

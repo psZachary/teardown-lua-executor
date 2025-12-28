@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import CodeEditor from "./components/CodeEditor.svelte";
   import ScriptList from "./components/ScriptList.svelte";
@@ -7,9 +7,9 @@
 
   let active_tab = 0;
   let game_structure = null;
-  let status_message = "";
-  let status_type = "success";
-  let status_visible = false;
+  let status_message: String = "";
+  let status_type: String = "success";
+  let status_visible: Boolean = false;
   $: attached = game_structure?.attached ?? false;
 
 
@@ -25,14 +25,14 @@
     }, 150);
   });
 
-  function show_status(msg, type = "success") {
+  function show_status(msg: String, type = "success") {
     status_message = msg;
     status_type = type;
     status_visible = true;
     setTimeout(() => (status_visible = false), 2000);
   }
 
-  async function execute_code(code) {
+  async function execute_code(code: String) {
     if (!code.trim()) {
       show_status("No code to execute", "error");
       return;
@@ -44,6 +44,18 @@
       show_status(
         result.error,
         result.error !== "Success" ? "error" : "success",
+      );
+    }
+  }
+
+  async function save_file(code: String) {
+    // @ts-ignore
+    if (window.cpp_save_file) {
+      // @ts-ignore 
+      const result = await cpp_save_file(code)
+      show_status(
+        result.error, 
+        result.error !== "Success" ? "error" : "success"
       );
     }
   }
@@ -73,10 +85,23 @@
       show_status(`Selected script index updated: ${index}`, "info");
     }
   }
+
+  function save_data() {
+    // your save logic here
+    console.log('saving...');
+  }
+
+  function handle_keydown(e) {
+    if (e.ctrlKey && e.key === 's') {
+          e.preventDefault();
+          save_data();
+    }
+  }
+
 </script>
 
 <svelte:head>
-  
+
 </svelte:head>
 
 <svelte:window on:contextmenu|preventDefault />
@@ -126,7 +151,7 @@
         <Home></Home>
       {/if}
       {#if active_tab === 1}
-        <CodeEditor on_execute={execute_code} on_load_file={load_file} />
+        <CodeEditor on_save_file={save_file} on_execute={execute_code} on_load_file={load_file} />
       {/if}
       {#if active_tab === 2}
         <ScriptList

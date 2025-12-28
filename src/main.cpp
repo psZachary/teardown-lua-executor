@@ -7,7 +7,7 @@
 #include "../resource/resource.h"
 #include "lua_shellcode.hpp"
 #include <json.hpp>
-#include "file_loader.hpp"
+#include "file_helper.hpp"
 #include <fstream>
 #include <thread>
 
@@ -107,7 +107,7 @@ int main() {
         nlohmann::json return_object{};
         return_object["error"] = "Success";
 
-        std::filesystem::path path = c_file_loader::load_lua_file();
+        std::filesystem::path path = c_file_helper::load_lua_file();
         if (path.empty() || !std::filesystem::exists(path)) {
             return_object["error"] = "File not found";
             return return_object.dump();
@@ -129,6 +129,30 @@ int main() {
         f.close();
         return_object["code"] = buf.str();
         
+        return return_object.dump();
+    });
+
+    w.bind("cpp_save_file", [&](const std::string& req) -> std::string {
+        nlohmann::json return_object{};
+        return_object["error"] = "Success";
+
+        nlohmann::json parsed_request = nlohmann::json::parse(req, nullptr, false);
+        if (parsed_request.is_discarded()) {
+            return_object["error"] = "Failed to parse incoming data";
+            return return_object.dump();
+        }
+
+        std::string lua_code = parsed_request[0].get<std::string>();
+        if (lua_code.empty()) {
+            return_object["error"] = "File empty";
+            return return_object.dump();
+        }
+
+        if (!c_file_helper::save_file(lua_code)) {
+            return_object["error"] = "Failed to save file";
+            return return_object.dump();
+        }
+
         return return_object.dump();
     });
 

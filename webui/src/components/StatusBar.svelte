@@ -1,7 +1,7 @@
-<script>
-  export let message = "";
-  export let type = "success";
-  export let visible = false;
+<script lang="ts">
+  export let message: String = "";
+  export let type: String = "success";
+  export let visible: Boolean = false;
   
   $: color_class = type === "error" ? 'text-red-400' : type === "success" ? 'text-green-400' : 'text-blue-600';
 </script>

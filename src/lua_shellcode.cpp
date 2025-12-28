@@ -1,5 +1,6 @@
 #include "lua_shellcode.hpp"
 #include "game.hpp"
+#include <optional>
 
 /*
     JMC Debugging is disabled in the project for Debug to
@@ -92,7 +93,7 @@ void initialize_execution_data(
     data.state = (lua::lua_state*)state;
 }
 
-int execute_lua_remote_sync(const std::string& code) {
+std::pair<int, std::optional<std::string>> execute_lua_remote_sync(const std::string& code) {
     lua_execution_data_t lua_exec_data{};
     void* remote_data = nullptr;
     void* remote_code = nullptr;
@@ -103,16 +104,16 @@ int execute_lua_remote_sync(const std::string& code) {
     game::c_script_core using_core{};
 
     ctx = game::c_context::instance();
-    if (!ctx) return 1;
+    if (!ctx) return { 1, std::nullopt };
 
     scene = ctx.scene;
-    if (!scene) return 2;
+    if (!scene) return { 2, std::nullopt };
 
     scripts = scene.scripts;
-    if (!scripts) return 3;
+    if (!scripts) return { 3, std::nullopt };
 
     using_script = scripts.get(g_using_script_index);
-    if (!using_script) return 4;
+    if (!using_script) return { 4, std::nullopt };
 
     using_core = using_script.server_core;
 
@@ -121,7 +122,7 @@ int execute_lua_remote_sync(const std::string& code) {
     // allocate data & shellcode
     remote_data = memutil::c_mem::instance()->alloc(nullptr, sizeof(lua_exec_data), MEM_COMMIT, PAGE_READWRITE);
     remote_code = memutil::c_mem::instance()->alloc(nullptr, 0x1000, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-    if (!remote_data || !remote_code) return 5;
+    if (!remote_data || !remote_code) return { 5, std::nullopt };
 
     // fill in data & shellcode
     memutil::c_mem::instance()->wpm(remote_data, &lua_exec_data, sizeof(lua_exec_data));
@@ -129,26 +130,30 @@ int execute_lua_remote_sync(const std::string& code) {
 
     // start the execution
     HANDLE thread = memutil::c_mem::instance()->create_remote_thread(nullptr, 0, remote_code, remote_data, 0, nullptr);
-    if (!thread) return 6;
+    if (!thread) return { 6, std::nullopt };
     
     // wait for shellcode to return
-    if (memutil::c_mem::instance()->wait_for_single_object(thread, INFINITE) == WAIT_FAILED)
-        return 7;
+    if (memutil::c_mem::instance()->wait_for_single_object(thread, INFINITE) == WAIT_FAILED) {
+        memutil::c_mem::instance()->free(remote_data, 0, MEM_RELEASE);
+        memutil::c_mem::instance()->free(remote_code, 0, MEM_RELEASE);
+        return { 7, std::nullopt };
+    }
 
     lua_execution_data_t result{};
     memutil::c_mem::instance()->rpm(remote_data, &result, sizeof(result));
 
-    printf("compile_error: %d\n", result.compile_error);
-    printf("run_error: %d\n", result.run_error);
     if (result.compile_error != 0 || result.run_error != 0) {
-        printf("error message: %s\n", result.error_msg);
+        memutil::c_mem::instance()->free(remote_data, 0, MEM_RELEASE);
+        memutil::c_mem::instance()->free(remote_code, 0, MEM_RELEASE);
+        memutil::c_mem::instance()->close_handle(thread);
+
+        return { 8, result.error_msg };
     }
 
-    // free data / shellcode
+    // free data / shellcode / cleanup
     memutil::c_mem::instance()->free(remote_data, 0, MEM_RELEASE);
     memutil::c_mem::instance()->free(remote_code, 0, MEM_RELEASE);
-
-    // cleanup
     memutil::c_mem::instance()->close_handle(thread);
-    return 0;
+
+    return { 0, "Success"};
 }

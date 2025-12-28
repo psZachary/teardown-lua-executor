@@ -5,15 +5,25 @@
   import StatusBar from "./components/StatusBar.svelte";
   import Home from "./components/Home.svelte";
 
-  let active_tab = 0;
-  let game_structure = null;
-  let status_message: String = "";
-  let status_type: String = "success";
-  let status_visible: Boolean = false;
-  $: attached = game_structure?.attached ?? false;
+  class GameScript {
+    index: number;
+    path: string;
+    has_client: boolean;
+    has_server: boolean;
+  }
+  class GameStructure {
+    scripts: Array<GameScript>;
+    attached: boolean;
+    build_type: string;
+  }
 
+  let active_tab: number = 0;
+  let game_structure: GameStructure = null;
+  let status_message: string = "";
+  let status_type: string = "success";
+  let status_visible: boolean = false;
 
-  // we are using ts-ignore for all errors derived from usage of webview2 setup as it sets up the js environment before loaded 
+  // we are using ts-ignore for all errors derived from usage of webview2 setup as it sets up the js environment before loaded
 
   onMount(() => {
     setInterval(async () => {
@@ -25,11 +35,11 @@
     }, 150);
   });
 
-  function show_status(msg: String, type = "success") {
+  function show_status(msg: string, type = "success", duration: number = 2000) {
     status_message = msg;
     status_type = type;
     status_visible = true;
-    setTimeout(() => (status_visible = false), 2000);
+    setTimeout(() => (status_visible = false), duration);
   }
 
   async function execute_code(code: String) {
@@ -44,6 +54,7 @@
       show_status(
         result.error,
         result.error !== "Success" ? "error" : "success",
+        5000
       );
     }
   }
@@ -51,11 +62,11 @@
   async function save_file(code: String) {
     // @ts-ignore
     if (window.cpp_save_file) {
-      // @ts-ignore 
-      const result = await cpp_save_file(code)
+      // @ts-ignore
+      const result = await cpp_save_file(code);
       show_status(
-        result.error, 
-        result.error !== "Success" ? "error" : "success"
+        result.error,
+        result.error !== "Success" ? "error" : "success",
       );
     }
   }
@@ -85,41 +96,29 @@
       show_status(`Selected script index updated: ${index}`, "info");
     }
   }
-
-  function save_data() {
-    // your save logic here
-    console.log('saving...');
-  }
-
-  function handle_keydown(e) {
-    if (e.ctrlKey && e.key === 's') {
-          e.preventDefault();
-          save_data();
-    }
-  }
-
 </script>
 
-<svelte:head>
-
-</svelte:head>
+<svelte:head></svelte:head>
 
 <svelte:window on:contextmenu|preventDefault />
 
 <div
   class="bg-[#0a0a0a] shrink-0 fixed inset-0 p-4 flex flex-col text-white select-none"
 >
-  <div class="flex items-center gap-3 mb-4">
-    <div
-      class="w-3 h-3 {attached
-        ? 'bg-indigo-500'
-        : 'bg-rose-400'} rounded-full pulse"
-    ></div>
-    <h1 class="text-xl font-bold text-white">Teardown Executor</h1>
+  <div class="flex flex-col" id="header-items">
+    <div class="flex gap-3 items-center">
+      <div
+        class="w-3 h-3 mt-1 {game_structure?.attached
+          ? 'bg-indigo-500'
+          : 'bg-rose-400'} rounded-full pulse"
+      ></div>
+      <h1 class="text-2xl font-bold text-white">Teardown Executor</h1>
+    </div>
+    <h1 class="text-sm">Teardown Executor - {game_structure?.build_type ?? "Web UI Development"} - {game_structure?.attached ? "Attached" : "Not Attached"}</h1>
   </div>
 
   <div class="flex border-b shrink-0 pb-2 border-gray-200/25 mb-2">
-        <button
+    <button
       on:click={() => (active_tab = 0)}
       class="tab-btn px-4 py-2 border-b-2 {active_tab === 0
         ? 'border-indigo-500 text-indigo-600'
@@ -151,7 +150,11 @@
         <Home></Home>
       {/if}
       {#if active_tab === 1}
-        <CodeEditor on_save_file={save_file} on_execute={execute_code} on_load_file={load_file} />
+        <CodeEditor
+          on_save_file={save_file}
+          on_execute={execute_code}
+          on_load_file={load_file}
+        />
       {/if}
       {#if active_tab === 2}
         <ScriptList
@@ -196,7 +199,7 @@
 
   :global(button:hover) {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px #6366f14d;
+    box-shadow: 0 2px 0px #6366f14d;
   }
 
   :global(button:active) {
@@ -219,5 +222,4 @@
   :global(::-webkit-scrollbar-thumb:hover) {
     background: #555;
   }
-  
 </style>

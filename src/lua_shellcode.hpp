@@ -2,6 +2,7 @@
 
 #include "lua.hpp"
 #include <string>
+#include <optional>
 
 #define MAX_LUA_CODE_LEN    (2 << 15)   // 65536
 #define LOADSTRING_FIELD    11          // loadstring
@@ -26,4 +27,4 @@ struct lua_execution_data_t {
 __declspec(noinline)
 void __stdcall lua_execution_shellcode(lua_execution_data_t* data);
 
-int execute_lua_remote_sync(const std::string& code);
+std::pair<int, std::optional<std::string>> execute_lua_remote_sync(const std::string& code);

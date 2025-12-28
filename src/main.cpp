@@ -15,7 +15,9 @@ using namespace memutil;
 using namespace nlohmann;
 
 #ifndef _DEBUG
-#define _DEBUG 0
+#define _RELEASE 1
+#else 
+#define _RELEASE 0
 #endif
 
 static std::string load_html_resource() {
@@ -65,6 +67,7 @@ static json build_game_structure() {
 
     result["scripts"] = build_script_array();
     result["attached"] = c_mem::instance()->valid() && lua::g_initialized;
+    result["build_type"] = (_RELEASE ? "Release" : "Debug");
     return result;
 }
 
@@ -80,7 +83,7 @@ int main() {
     c_mem::instance()->attach("teardown.exe", PROCESS_ALL_ACCESS);
     lua::initialize();
 
-    webview::webview w(_DEBUG, nullptr);
+    webview::webview w(not _RELEASE, nullptr);
     w.set_title("Teardown Lua Executor");
     w.set_size(400, 300, WEBVIEW_HINT_MIN);
     w.set_size(1600, 900, WEBVIEW_HINT_NONE);
@@ -94,10 +97,13 @@ int main() {
         if (parsed_request.is_discarded()) return "";
 
         std::string code = parsed_request[0].get<std::string>();
-        int execution_result = execute_lua_remote_sync(code);
+        auto [execution_result, err_message] = execute_lua_remote_sync(code);
         if (execution_result != 0) {
-            return_object["error"] = "Critical error during execution! Error reference: " + std::to_string(execution_result);
-            return return_object.dump();;
+            if (err_message.has_value()) 
+                return_object["error"] = err_message.value();
+            else
+                return_object["error"] = "Critical error during execution! Error reference: " + std::to_string(execution_result);
+            return return_object.dump();
         }
 
         return return_object.dump();

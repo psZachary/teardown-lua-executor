@@ -1,2 +1,4 @@
 #include "resource.h"
+
+IDI_ICON1 ICON "../icon/icon.ico"
 IDR_UI_HTML RCDATA "../webui/dist/index.html"

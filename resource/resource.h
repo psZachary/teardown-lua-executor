@@ -1,3 +1,4 @@
 #pragma once
 
-#define IDR_UI_HTML 101
+#define IDI_ICON1 101
+#define IDR_UI_HTML 102

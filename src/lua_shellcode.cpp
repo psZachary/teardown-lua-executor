@@ -75,6 +75,7 @@ void initialize_execution_data(
     lua::lua_state* state,
     const std::string& code
 ) {
+    memset(&data, 0, sizeof(data));
     const char* sz_loadstring_field = "loadstring";
 
     // copy lua code to buffer in data
@@ -92,6 +93,17 @@ void initialize_execution_data(
     // dynamic state grabbing TODO
     data.state = (lua::lua_state*)state;
 }
+void sanitize_execution_data(lua_execution_data_t& data) {
+    data.error_msg[sizeof(data.error_msg) - 1] = '\0';
+
+    for (int i = 0; i < sizeof(data.error_msg) - 1; i++) {
+        unsigned char c = data.error_msg[i];
+        if (c != '\0' && (c < 0x20 || c >= 0x7F)) {
+            data.error_msg[i] = '\0';
+            break;
+        }
+    }
+}
 
 std::pair<int, std::optional<std::string>> execute_lua_remote_sync(const std::string& code) {
     lua_execution_data_t lua_exec_data{};
@@ -103,17 +115,20 @@ std::pair<int, std::optional<std::string>> execute_lua_remote_sync(const std::st
     game::c_script using_script{};
     game::c_script_core using_core{};
 
+    if (!memutil::c_mem::instance() || !memutil::c_mem::instance()->valid())
+        return { -1, "Not attached" };
+
     ctx = game::c_context::instance();
-    if (!ctx) return { 1, std::nullopt };
+    if (!ctx) return { 1, "Game context invalid"};
 
     scene = ctx.scene;
-    if (!scene) return { 2, std::nullopt };
+    if (!scene) return { 2, "Invalid scene"};
 
     scripts = scene.scripts;
-    if (!scripts) return { 3, std::nullopt };
+    if (!scripts) return { 3, "Scripts list invalid" };
 
     using_script = scripts.get(g_using_script_index);
-    if (!using_script) return { 4, std::nullopt };
+    if (!using_script) return { 4, "Invalid using script index "};
 
     using_core = using_script.server_core;
 
@@ -130,17 +145,18 @@ std::pair<int, std::optional<std::string>> execute_lua_remote_sync(const std::st
 
     // start the execution
     HANDLE thread = memutil::c_mem::instance()->create_remote_thread(nullptr, 0, remote_code, remote_data, 0, nullptr);
-    if (!thread) return { 6, std::nullopt };
+    if (!thread) return { 6, "Failed to create remote thread"};
     
     // wait for shellcode to return
-    if (memutil::c_mem::instance()->wait_for_single_object(thread, INFINITE) == WAIT_FAILED) {
+    if (memutil::c_mem::instance()->wait_for_single_object(thread, 10000) == WAIT_FAILED) {
         memutil::c_mem::instance()->free(remote_data, 0, MEM_RELEASE);
         memutil::c_mem::instance()->free(remote_code, 0, MEM_RELEASE);
-        return { 7, std::nullopt };
+        return { 7, "Failed to wait for thread"};
     }
 
     lua_execution_data_t result{};
     memutil::c_mem::instance()->rpm(remote_data, &result, sizeof(result));
+    sanitize_execution_data(result);
 
     if (result.compile_error != 0 || result.run_error != 0) {
         memutil::c_mem::instance()->free(remote_data, 0, MEM_RELEASE);

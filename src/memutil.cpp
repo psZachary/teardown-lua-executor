@@ -24,6 +24,8 @@ HANDLE memutil::c_mem::attach(const std::string& application, uint32_t access)
         } while (Process32NextW(snap, &entry));
     }
 
+    pid = 0;
+    h = 0;
     CloseHandle(snap);
     return nullptr;
 }

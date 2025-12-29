@@ -66,6 +66,7 @@ static json build_game_structure() {
     json result = json::object();
 
     result["scripts"] = build_script_array();
+    result["attached_message"] = !c_mem::instance()->valid() ? "Failed to open process" : (!lua::g_initialized ? "Failed to initialize Lua" : "Unknown");
     result["attached"] = c_mem::instance()->valid() && lua::g_initialized;
     result["build_type"] = (_RELEASE ? "Release" : "Debug");
     return result;
@@ -79,16 +80,28 @@ static void update() {
     }
 }
 
+static HWND init_window(webview::webview& w) {
+    HWND hwnd = static_cast<HWND>(w.window().value());
+    HICON icon = LoadIconA(GetModuleHandleA(nullptr), MAKEINTRESOURCEA(IDI_ICON1));
+    SendMessageA(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
+    SendMessageA(hwnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
+    return hwnd;
+}
+
+
 int main() {
     c_mem::instance()->attach("teardown.exe", PROCESS_ALL_ACCESS);
     lua::initialize();
 
+
     webview::webview w(not _RELEASE, nullptr);
+    init_window(w);
+
     w.set_title("Teardown Lua Executor");
     w.set_size(400, 300, WEBVIEW_HINT_MIN);
     w.set_size(1600, 900, WEBVIEW_HINT_NONE);
     w.set_html(load_html_resource());
- 
+
     w.bind("cpp_execute", [&](const std::string& req) -> std::string {
         nlohmann::json return_object{};
         return_object["error"] = "Success";

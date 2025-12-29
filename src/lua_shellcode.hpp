@@ -9,10 +9,11 @@
 
 extern int g_using_script_index;
 
+#pragma pack(push, 1)
 struct lua_execution_data_t {
-    char loadstring_field[11]{ 0 };
-    char code[LOADSTRING_FIELD]{ 0 };
-    char error_msg[256]{ 0 };
+    char loadstring_field[LOADSTRING_FIELD]{ 0 };
+    char code[MAX_LUA_CODE_LEN]{ 0 };
+    char error_msg[1024]{ 0 };
     lua::lua_state* state = nullptr;
     lua::getfield_t lua_getfield = nullptr;
     lua::pushstring_t lua_pushstring = nullptr;
@@ -23,7 +24,7 @@ struct lua_execution_data_t {
     int compile_error = 0;
     int run_error = 0;
 };
-
+#pragma pack(pop)
 __declspec(noinline)
 void __stdcall lua_execution_shellcode(lua_execution_data_t* data);
 

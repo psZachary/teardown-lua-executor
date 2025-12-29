@@ -10,13 +10,13 @@ External Lua executor for Teardown using shellcode injection with a modern WebVi
 - File loading support
 - Real-time game connection status
 
-## Prerequisites
-
+## Usage Prerequisites
+- [**Teardown**](https://teardowngame.com/) game
+- [**WebView2 Runtime**](https://developer.microsoft.com/en-us/Microsoft-edge/webview2/?form=MA13LH#download) (usually pre-installed on Windows 10/11)
+## Build Prerequisites
 - [**Node.js 18+**](https://nodejs.org/en/download) and npm
 - [**Visual Studio 2026**](https://visualstudio.microsoft.com/downloads/) with C++ desktop development tools
-- [**WebView2 Runtime**](https://developer.microsoft.com/en-us/Microsoft-edge/webview2/?form=MA13LH#download) (usually pre-installed on Windows 10/11)
-- [**Teardown**](https://teardowngame.com/) game
-
+  
 ## Building
 
 ### 1. Clone the Repository

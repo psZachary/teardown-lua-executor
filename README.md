@@ -30,8 +30,7 @@ cd teardown-lua-executor
 cd webui
 npm install
 ```
-
-This will install the following packages:```
+This will install the following packages:
 - @emnapi/core@1.7.1 extraneous
 - @emnapi/runtime@1.7.1 extraneous
 - @emnapi/wasi-threads@1.1.0 extraneous

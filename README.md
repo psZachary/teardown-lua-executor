@@ -12,10 +12,10 @@ External Lua executor for Teardown using shellcode injection with a modern WebVi
 
 ## Prerequisites
 
-- **Node.js 18+** and npm
-- **Visual Studio 2022** with C++ desktop development tools
+- [**Node.js 18+**](https://nodejs.org/en/download) and npm
+- [**Visual Studio 2026**](https://visualstudio.microsoft.com/downloads/) with C++ desktop development tools
 - [**WebView2 Runtime**](https://developer.microsoft.com/en-us/Microsoft-edge/webview2/?form=MA13LH#download) (usually pre-installed on Windows 10/11)
-- **Teardown** game
+- [**Teardown**](https://teardowngame.com/) game
 
 ## Building
 
@@ -31,23 +31,17 @@ cd webui
 npm install
 ```
 This will install the following packages:
-- @emnapi/core@1.7.1 extraneous
-- @emnapi/runtime@1.7.1 extraneous
-- @emnapi/wasi-threads@1.1.0 extraneous
-- @lucide/svelte@0.562.0
-- @napi-rs/wasm-runtime@1.1.0 extraneous
-- @sveltejs/vite-plugin-svelte@6.2.1
-- @tailwindcss/vite@4.1.18
-- @tybys/wasm-util@0.10.1 extraneous
-- @zerodevx/svelte-toast@0.9.6
-- autoprefixer@10.4.23
-- codemirror@5.65.20
-- postcss@8.5.6
-- svelte@5.46.1
-- tailwindcss@4.1.18
-- tslib@2.8.1 extraneous
-- vite-plugin-singlefile@2.3.0
-- vite@npm:rolldown-vite@7.2.5
+```json
+{
+  "@sveltejs/vite-plugin-svelte": "^6.2.1",
+  "@zerodevx/svelte-toast": "^0.9.6",
+  "autoprefixer": "^10.4.23",
+  "postcss": "^8.5.6",
+  "svelte": "^5.43.8",
+  "vite": "npm:rolldown-vite@7.2.5",
+  "vite-plugin-singlefile": "^2.3.0"
+}
+```
 
 ### 3. Build with Visual Studio
 

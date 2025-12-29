@@ -31,16 +31,24 @@ cd webui
 npm install
 ```
 
-This will install the following packages:
-- `@sveltejs/vite-plugin-svelte@6.2.1`
-- `@tailwindcss/vite@4.1.18`
-- `autoprefixer@10.4.23`
-- `codemirror@5.65.20`
-- `postcss@8.5.6`
-- `svelte@5.46.1`
-- `tailwindcss@4.1.18`
-- `vite-plugin-singlefile@2.3.0`
-- `vite@npm:rolldown-vite@7.2.5`
+This will install the following packages:```
+- @emnapi/core@1.7.1 extraneous
+- @emnapi/runtime@1.7.1 extraneous
+- @emnapi/wasi-threads@1.1.0 extraneous
+- @lucide/svelte@0.562.0
+- @napi-rs/wasm-runtime@1.1.0 extraneous
+- @sveltejs/vite-plugin-svelte@6.2.1
+- @tailwindcss/vite@4.1.18
+- @tybys/wasm-util@0.10.1 extraneous
+- @zerodevx/svelte-toast@0.9.6
+- autoprefixer@10.4.23
+- codemirror@5.65.20
+- postcss@8.5.6
+- svelte@5.46.1
+- tailwindcss@4.1.18
+- tslib@2.8.1 extraneous
+- vite-plugin-singlefile@2.3.0
+- vite@npm:rolldown-vite@7.2.5
 
 ### 3. Build with Visual Studio
 

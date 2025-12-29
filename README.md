@@ -11,6 +11,7 @@ External Lua executor for Teardown using shellcode injection with a modern WebVi
 - Real-time game connection status
 
 ## Usage Prerequisites
+- [**Visual C++ Redistributable v14 (x64)**](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#visual-c-redistributable-v14)
 - [**Teardown**](https://teardowngame.com/) game
 - [**WebView2 Runtime**](https://developer.microsoft.com/en-us/Microsoft-edge/webview2/?form=MA13LH#download) (usually pre-installed on Windows 10/11)
 ## Build Prerequisites

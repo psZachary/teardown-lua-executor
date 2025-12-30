@@ -118,18 +118,29 @@ static int entry() {
     c_mem::instance()->attach("teardown.exe", PROCESS_ALL_ACCESS);
     lua::initialize();
 
-    bool debug_mode = 1;
     webview::webview w(WEBVIEW2_DEBUG, nullptr);
     init_window(w);
     w.set_title("Teardown Lua Executor");
     w.set_size(400, 300, WEBVIEW_HINT_MIN);
     w.set_size(1600, 900, WEBVIEW_HINT_NONE);
 
-    if (WEBVIEW2_DEBUG)
+    if (WEBVIEW2_DEBUG) {
         w.navigate("http://localhost:5173");
-    else if (not WEBVIEW2_DEBUG)
-        w.set_html(load_html_resource());
+    }
+    else {
+        auto temp_path = c_mem::instance()->get_temp_path();
+        if (!temp_path.has_value())
+            return -1;
 
+        std::string resource = load_html_resource();
+        std::string html_path = (temp_path.value() / "ui.html").generic_string();
+
+        std::ofstream out(html_path);
+        out << resource;
+        out.close();
+
+        w.navigate("file:///" + html_path);
+    }
     w.bind("cpp_execute", [&](const std::string& req) -> std::string {
         nlohmann::json return_object{};
         return_object["error"] = "Success";

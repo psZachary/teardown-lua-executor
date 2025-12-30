@@ -64,6 +64,7 @@ namespace memutil {
 
         HANDLE attach(const std::string& application, uint32_t access);
         std::filesystem::path get_process_path();
+        std::optional<std::filesystem::path> get_temp_path();
 
         bool rpm(uintptr_t addr, void* out, size_t size) const;
         bool wpm(uintptr_t addr, const void* buffer, size_t size) const;

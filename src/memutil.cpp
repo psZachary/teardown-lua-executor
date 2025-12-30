@@ -43,6 +43,15 @@ std::filesystem::path memutil::c_mem::get_process_path()
     return path;
 }
 
+std::optional<std::filesystem::path> memutil::c_mem::get_temp_path()
+{
+    char temp_path[MAX_PATH];
+    if (!GetTempPathA(MAX_PATH, temp_path))
+        return std::nullopt;
+    
+    return std::filesystem::path(temp_path);
+}
+
 bool memutil::c_mem::rpm(uintptr_t addr, void* out, size_t size) const {
     size_t bytes_read = 0;
     return ReadProcessMemory(h, (LPCVOID)addr, out, size, &bytes_read) && bytes_read == size;

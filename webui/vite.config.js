@@ -4,9 +4,16 @@ import { viteSingleFile } from 'vite-plugin-singlefile'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-    plugins: [svelte(), viteSingleFile(), tailwindcss()],
-    build: {
-        cssCodeSplit: false,
-        assetsInlineLimit: 100000000
-    }
+  plugins: [svelte(), viteSingleFile(), tailwindcss()],
+  build: {
+    cssCodeSplit: false,
+    assetsInlineLimit: 100000000,
+    target: "esnext",
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: true,
+        manualChunks: undefined,
+      },
+    },
+  },
 })

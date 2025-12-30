@@ -163,9 +163,9 @@ npm run build</Command>
     </Link>
     <PreBuildEvent>
       <Command>cd $(ProjectDir)webui
-call 
-npm run build</Command>
-      <Message>Runs NPM build for WebUI</Message>
+
+call npm --no-color run build</Command>
+      <Message>Running NPM build for WebUI</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

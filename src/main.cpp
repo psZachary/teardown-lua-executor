@@ -15,10 +15,10 @@
 using namespace memutil;
 using namespace nlohmann;
 
-#ifndef _DEBUG
-#define _RELEASE 1
-#else 
-#define _RELEASE 0
+#ifdef _DEBUG
+#define WEBVIEW2_DEBUG 1
+#else
+#define WEBVIEW2_DEBUG 0
 #endif
 
 static std::string load_html_resource() {
@@ -77,13 +77,13 @@ static json build_game_structure() {
     result["scripts"] = build_script_array();
     result["attached_message"] = !c_mem::instance()->valid() ? "Failed to open process" : (!lua::g_initialized ? "Failed to initialize Lua" : "Unknown");
     result["attached"] = c_mem::instance()->valid() && lua::g_initialized;
-    result["build_type"] = (_RELEASE ? "Release" : "Debug");
     return result;
 }
 
 static json get_build_info() {
     json result = json::object();
     result["version"] = VERSION_STRING;
+    result["build_type"] = (WEBVIEW2_DEBUG ? "Debug" : "Release");
     return result;
 }
 
@@ -114,20 +114,20 @@ static bool open_in_editor(const std::string& path) {
     return true;
 }
 
-int main() {
+static int entry() {
     c_mem::instance()->attach("teardown.exe", PROCESS_ALL_ACCESS);
     lua::initialize();
 
-
-    webview::webview w(not _RELEASE, nullptr);
+    bool debug_mode = 1;
+    webview::webview w(WEBVIEW2_DEBUG, nullptr);
     init_window(w);
     w.set_title("Teardown Lua Executor");
     w.set_size(400, 300, WEBVIEW_HINT_MIN);
     w.set_size(1600, 900, WEBVIEW_HINT_NONE);
 
-    if (not _RELEASE)
+    if (WEBVIEW2_DEBUG)
         w.navigate("http://localhost:5173");
-    else if (_RELEASE)
+    else if (not WEBVIEW2_DEBUG)
         w.set_html(load_html_resource());
 
     w.bind("cpp_execute", [&](const std::string& req) -> std::string {
@@ -142,7 +142,7 @@ int main() {
 
         auto [execution_result, err_message] = execute_lua_remote_sync(code, use_server_core);
         if (execution_result != 0) {
-            if (err_message.has_value()) 
+            if (err_message.has_value())
                 return_object["error"] = err_message.value();
             else
                 return_object["error"] = "Critical error during execution! Error reference: " + std::to_string(execution_result);
@@ -181,7 +181,7 @@ int main() {
             return return_object.dump();
         }
         return_object["code"] = buf.str();
-        
+
         return return_object.dump();
     });
 
@@ -254,4 +254,18 @@ int main() {
 
     std::thread(update).detach();
     w.run();
+
+    return 0;
 }
+
+#ifdef NDEBUG
+int APIENTRY WinMain(HINSTANCE h_inst, HINSTANCE h_inst_prefv, PSTR cmdline, int cmdshow) {
+    return entry();
+}
+#endif
+
+#ifdef _DEBUG
+int main() {
+    return entry();
+}
+#endif

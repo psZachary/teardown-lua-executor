@@ -49,7 +49,6 @@
     if (window.cpp_get_build_info) {
       // @ts-ignore
       const result = await window.cpp_get_build_info();
-      console.log(result);
       return result;
     }
   }
@@ -152,7 +151,7 @@
       </div>
     </div>
     <h1 class="text-sm text-gray-400">
-      Teardown Executor - {build_info?.version ?? "v0.0.0"} - {game_structure?.build_type ??
+      Teardown Executor - {build_info?.version ?? "v0.0.0"} - {build_info?.build_type ??
         "Web UI Development"} -
       {game_structure?.attached ? "Attached" : "Not Attached"}
     </h1>
@@ -191,7 +190,7 @@
     >
       Script View
     </button>
-    {#if ["Debug", "", undefined].includes(game_structure?.build_type)}
+    {#if ["Debug", "", undefined].includes(build_info?.build_type)}
       <button
         on:click={() => (active_tab = 10)}
         class="tab-btn px-4 py-2 border-b-2 {active_tab === 10
@@ -208,7 +207,7 @@
       {#if active_tab === 0}
         <Home
           attached={game_structure?.attached}
-          build_type={game_structure?.build_type}
+          build_type={build_info?.build_type}
           script_count={game_structure?.scripts?.length}
           {selected_script_index}
           last_attached_message={game_structure?.attached_message}

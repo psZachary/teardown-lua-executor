@@ -9,9 +9,9 @@ export interface GameStructure {
     scripts: Array<GameScript>;
     attached: boolean;
     attached_message: string;
-    build_type: string;
 }
 
 export interface BuildInfo {
     version: string;
+    build_type: string;
 }

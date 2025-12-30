@@ -1,13 +1,15 @@
 # Teardown Lua Executor
 
-External Lua executor for Teardown using shellcode injection with a modern WebView2 UI built in Svelte, TailwindCSS, and CodeMirror.
+External Lua executor for the Teardown game using shellcode injection with a modern WebView2 UI built in Svelte, TailwindCSS, and CodeMirror.
 
 ## Features
 
 - Execute Lua code in Teardown at runtime
 - Modern dark-themed code editor with syntax highlighting
+- Build into lua formatting / beautification
 - Script browser to view and select loaded game scripts
-- File loading support
+- File loading / saving / viewing
+- Ability to script between server and client execution
 - Real-time game connection status
 
 ## Usage Prerequisites
@@ -31,19 +33,6 @@ cd teardown-lua-executor
 cd webui
 npm install
 ```
-This will install the following packages:
-```json
-{
-  "@sveltejs/vite-plugin-svelte": "^6.2.1",
-  "@zerodevx/svelte-toast": "^0.9.6",
-  "autoprefixer": "^10.4.23",
-  "postcss": "^8.5.6",
-  "svelte": "^5.43.8",
-  "vite": "npm:rolldown-vite@7.2.5",
-  "vite-plugin-singlefile": "^2.3.0"
-}
-```
-
 ### 3. Build with Visual Studio
 
 1. Open the solution in Visual Studio 2022
@@ -55,16 +44,11 @@ This will install the following packages:
 teardown-lua-executor/
 ├── webui/                              # Svelte UI
 │   └── src/                            # UI Source
-│       ├── components/                 # UI Components (Tabs)
-│       │   ├── CodeEditor.svelte       # Code editor for the executor
-│       │   ├── Home.svelte             # Home page
-│       │   ├── ScriptList.svelte       # Provides current game scripts via IPC from C++
-│       │   └── StatusBar.svelte        # Status bar
-│       ├── app.css                     # Import TailwindCSS
-│       ├── app.svelte                  # Provides entry point & Webview2 IPC to components
-│       └── main.js 
+│       ├── components/                 # UI Components
+│       └── app.svelte                  # Provides entry point & Webview2 IPC to components
 ├── src/                                # C++ project functionality
 │   └── C++ Backend...
+├── icon/                               # Contains the handmade ICO for the application
 ├── resource/                           # C++ embeddable resources
 │   ├── resource.h
 │   └── resource.rc

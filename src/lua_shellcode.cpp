@@ -135,6 +135,7 @@ std::pair<int, std::optional<std::string>> execute_lua_remote_sync(const std::st
     if (!using_core) return { -2, "Invalid core" };
     
     // copy the code data from browser to the .data buffer
+    memset(g_lua_code, 0, sizeof(g_lua_code));
     std::copy(code.begin(), code.end(), g_lua_code);
 
     // allocate data & shellcode

@@ -1,13 +1,15 @@
 # Teardown Lua Executor
 
-External Lua executor for Teardown using shellcode injection with a modern WebView2 UI built in Svelte, TailwindCSS, and CodeMirror.
+External Lua executor for the Teardown game using shellcode injection with a modern WebView2 UI built in Svelte, TailwindCSS, and CodeMirror.
 
 ## Features
 
 - Execute Lua code in Teardown at runtime
 - Modern dark-themed code editor with syntax highlighting
+- Build into lua formatting / beautification
 - Script browser to view and select loaded game scripts
-- File loading support
+- File loading / saving / viewing
+- Ability to script between server and client execution
 - Real-time game connection status
 
 ## Usage Prerequisites

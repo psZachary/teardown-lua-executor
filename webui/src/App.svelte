@@ -25,7 +25,16 @@
 
   // we are using ts-ignore for all errors derived from usage of webview2 setup as it sets up the js environment before loaded
   onMount(async () => {
-    build_info = await get_build_info();
+    // retry 10 times waiting for webview2 runtime to initialize
+    for (let i = 0; i < 10; i++) {
+      // @ts-ignore
+      if (window.cpp_get_build_info) {
+        build_info = await get_build_info();
+        break;
+      }
+      await new Promise((r) => setTimeout(r, 100));
+    }
+
     setInterval(async () => {
       // @ts-ignore
       if (window.cpp_get_game_structure) {
@@ -40,6 +49,7 @@
     if (window.cpp_get_build_info) {
       // @ts-ignore
       const result = await window.cpp_get_build_info();
+      console.log(result);
       return result;
     }
   }
@@ -142,7 +152,8 @@
       </div>
     </div>
     <h1 class="text-sm text-gray-400">
-      Teardown Executor - {build_info?.version ?? "v0.0.0"} - {game_structure?.build_type ?? "Web UI Development"} -
+      Teardown Executor - {build_info?.version ?? "v0.0.0"} - {game_structure?.build_type ??
+        "Web UI Development"} -
       {game_structure?.attached ? "Attached" : "Not Attached"}
     </h1>
   </div>
@@ -219,7 +230,7 @@
           {game_structure}
           {selected_script_index}
           on_open_file={open_file}
-          bind:use_server_core={use_server_core}
+          bind:use_server_core
         />
       {/if}
       {#if active_tab === 10}

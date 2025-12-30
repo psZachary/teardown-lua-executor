@@ -31,19 +31,6 @@ cd teardown-lua-executor
 cd webui
 npm install
 ```
-This will install the following packages:
-```json
-{
-  "@sveltejs/vite-plugin-svelte": "^6.2.1",
-  "@zerodevx/svelte-toast": "^0.9.6",
-  "autoprefixer": "^10.4.23",
-  "postcss": "^8.5.6",
-  "svelte": "^5.43.8",
-  "vite": "npm:rolldown-vite@7.2.5",
-  "vite-plugin-singlefile": "^2.3.0"
-}
-```
-
 ### 3. Build with Visual Studio
 
 1. Open the solution in Visual Studio 2022

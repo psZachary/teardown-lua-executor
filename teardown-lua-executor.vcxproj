@@ -76,12 +76,12 @@
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)build\</OutDir>
     <IntDir>$(SolutionDir)build\intermediate\</IntDir>
-    <TargetName>$(ProjectName)-$(Configuration)</TargetName>
+    <TargetName>$(ProjectName.ToLower())-$(Configuration.ToLower())</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(ProjectDir)dependencies\json\include\;$(ProjectDir)dependencies\webview2\include\;$(ProjectDir)dependencies\webview\include\;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
-    <TargetName>$(ProjectName)-$(Configuration)</TargetName>
+    <TargetName>$(ProjectName.ToLower())-$(Configuration.ToLower())</TargetName>
     <OutDir>$(SolutionDir)build\</OutDir>
     <IntDir>$(SolutionDir)build\intermediate\</IntDir>
   </PropertyGroup>

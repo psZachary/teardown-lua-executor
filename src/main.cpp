@@ -52,8 +52,16 @@ static json build_script_array() {
         game::c_script script = scripts.get(i);
         if (!script.address) continue;
 
+        std::filesystem::path script_path = script.resolved_path;
+        if (!script_path.is_absolute()) {
+            // append teardown path because of relative path (usually script is teardown/data/...)
+            script_path = (c_mem::instance()->get_process_path().parent_path() / script_path).generic_string();
+        }
+
+
+
         script_object["index"] = std::to_string(i);
-        script_object["path"] = script.resolved_path.c_str();
+        script_object["path"] = script_path;
         script_object["has_client"] = (script.local_core.address ? true : false);
         script_object["has_server"] = (script.server_core.address ? true : false);
         result.push_back(script_object);
@@ -88,6 +96,16 @@ static HWND init_window(webview::webview& w) {
     return hwnd;
 }
 
+static bool open_in_editor(const std::string& path) {
+    auto result = (int64_t)ShellExecuteA(nullptr, "open", path.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+
+    // fallback to notepad
+    if (result <= 32) {
+        return (int64_t)ShellExecuteA(nullptr, "open", "notepad.exe", path.c_str(), nullptr, SW_SHOWNORMAL) > 32;
+    }
+
+    return true;
+}
 
 int main() {
     c_mem::instance()->attach("teardown.exe", PROCESS_ALL_ACCESS);
@@ -96,11 +114,14 @@ int main() {
 
     webview::webview w(not _RELEASE, nullptr);
     init_window(w);
-
     w.set_title("Teardown Lua Executor");
     w.set_size(400, 300, WEBVIEW_HINT_MIN);
     w.set_size(1600, 900, WEBVIEW_HINT_NONE);
-    w.set_html(load_html_resource());
+
+    if (not _RELEASE)
+        w.navigate("http://localhost:5173");
+    else if (_RELEASE)
+        w.set_html(load_html_resource());
 
     w.bind("cpp_execute", [&](const std::string& req) -> std::string {
         nlohmann::json return_object{};
@@ -110,7 +131,9 @@ int main() {
         if (parsed_request.is_discarded()) return "";
 
         std::string code = parsed_request[0].get<std::string>();
-        auto [execution_result, err_message] = execute_lua_remote_sync(code);
+        bool use_server_core = parsed_request[1].get<bool>();
+
+        auto [execution_result, err_message] = execute_lua_remote_sync(code, use_server_core);
         if (execution_result != 0) {
             if (err_message.has_value()) 
                 return_object["error"] = err_message.value();
@@ -146,6 +169,10 @@ int main() {
         std::stringstream buf{};
         buf << f.rdbuf();
         f.close();
+        if (!c_mem::instance()->is_valid_utf8_win(buf.str())) {
+            return_object["error"] = "Invalid file encoding";
+            return return_object.dump();
+        }
         return_object["code"] = buf.str();
         
         return return_object.dump();
@@ -169,6 +196,30 @@ int main() {
 
         if (!c_file_helper::save_file(lua_code)) {
             return_object["error"] = "Failed to save file";
+            return return_object.dump();
+        }
+
+        return return_object.dump();
+    });
+
+    w.bind("cpp_open_file", [&](const std::string& req) -> std::string {
+        nlohmann::json return_object{};
+        return_object["error"] = "Success";
+
+        nlohmann::json parsed_request = nlohmann::json::parse(req, nullptr, false);
+        if (parsed_request.is_discarded()) {
+            return_object["error"] = "Failed to parse incoming data";
+            return return_object.dump();
+        }
+
+        std::filesystem::path path = parsed_request[0].get<std::string>();
+        if (path.empty() || !std::filesystem::exists(path)) {
+            return_object["error"] = "Invalid path";
+            return return_object.dump();
+        }
+
+        if (!open_in_editor(path.generic_string())) {
+            return_object["error"] = "Failed to open file";
             return return_object.dump();
         }
 

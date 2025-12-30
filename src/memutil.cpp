@@ -1,6 +1,7 @@
 #include "memutil.hpp"
 #include <vector>
 #include <tlhelp32.h>
+#include <iostream>
 
 memutil::c_mem* memutil::c_mem::g_instance = nullptr;
 
@@ -16,7 +17,7 @@ HANDLE memutil::c_mem::attach(const std::string& application, uint32_t access)
     if (Process32FirstW(snap, &entry)) {
         do {
             if (_wcsicmp(entry.szExeFile, wide_name.c_str()) == 0) {
-                pid = entry.th32ProcessID;
+                pid = entry.th32ProcessID;     
                 h = OpenProcess(access, false, pid);
                 CloseHandle(snap);
                 return h;
@@ -28,6 +29,18 @@ HANDLE memutil::c_mem::attach(const std::string& application, uint32_t access)
     h = 0;
     CloseHandle(snap);
     return nullptr;
+}
+
+std::filesystem::path memutil::c_mem::get_process_path()
+{
+    std::string path(MAX_PATH, '\0');
+
+    DWORD size = MAX_PATH;
+    if (!QueryFullProcessImageNameA(h, 0, path.data(), &size))
+        size = 0;
+
+    path.resize(size);
+    return path;
 }
 
 bool memutil::c_mem::rpm(uintptr_t addr, void* out, size_t size) const {
@@ -144,6 +157,7 @@ static std::vector<int> parse_signature(const char* sig) {
     return pattern;
 }
 
+// We have to scan at runtime since the executable is packed
 memutil::pattern_result memutil::c_mem::sig_scan(uintptr_t base, size_t size, const char* signature)
 {
     pattern_result out{ 0 };
@@ -173,6 +187,7 @@ memutil::pattern_result memutil::c_mem::sig_scan(uintptr_t base, size_t size, co
     return out;
 }
 
+// We have to scan at runtime since the executable is packed
 memutil::pattern_result memutil::c_mem::sig_scan(std::string module_name, const char* signature)
 {
     pattern_result out{ 0 };

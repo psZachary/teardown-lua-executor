@@ -12,13 +12,14 @@
 */
 
 int g_using_script_index = 0;
+char g_lua_code[MAX_LUA_CODE_LEN]{ 0 };
 
 __declspec(noinline)
 void __stdcall lua_execution_shellcode(lua_execution_data_t* data) {
     // get loadstring
     data->lua_getfield(data->state, -10002, data->loadstring_field);
     // push code
-    data->lua_pushstring(data->state, data->code);
+    data->lua_pushstring(data->state, data->lua_code);
     // call loadstring(code) -> returns function or nil, errmsg
     data->compile_error = data->lua_pcall(data->state, 1, 2, 0);
 
@@ -73,13 +74,12 @@ void __stdcall lua_execution_shellcode(lua_execution_data_t* data) {
 void initialize_execution_data(
     lua_execution_data_t& data,
     lua::lua_state* state,
-    const std::string& code
+    char* code
 ) {
     memset(&data, 0, sizeof(data));
     const char* sz_loadstring_field = "loadstring";
 
-    // copy lua code to buffer in data
-    memcpy(data.code, code.data(), code.length() + 1);
+    data.lua_code = code;
     // copy loadstring for lua_getfield usage
     memcpy(data.loadstring_field, sz_loadstring_field, strlen(sz_loadstring_field) + 1);
     // copy the pointers to the lua functions
@@ -105,10 +105,11 @@ void sanitize_execution_data(lua_execution_data_t& data) {
     }
 }
 
-std::pair<int, std::optional<std::string>> execute_lua_remote_sync(const std::string& code) {
+std::pair<int, std::optional<std::string>> execute_lua_remote_sync(const std::string& code, bool use_server_core) {
     lua_execution_data_t lua_exec_data{};
     void* remote_data = nullptr;
     void* remote_code = nullptr;
+    void* remote_lua_code = nullptr;
     game::c_context ctx{};
     game::c_scene scene{};
     game::c_scripts_vector scripts{};
@@ -130,18 +131,25 @@ std::pair<int, std::optional<std::string>> execute_lua_remote_sync(const std::st
     using_script = scripts.get(g_using_script_index);
     if (!using_script) return { 4, "Invalid using script index "};
 
-    using_core = using_script.server_core;
-
-    initialize_execution_data(lua_exec_data, using_core.lua_wrapper.lua_state, code);
+    using_core = use_server_core ? using_script.server_core : using_script.local_core;
+    if (!using_core) return { -2, "Invalid core" };
+    
+    // copy the code data from browser to the .data buffer
+    std::copy(code.begin(), code.end(), g_lua_code);
 
     // allocate data & shellcode
     remote_data = memutil::c_mem::instance()->alloc(nullptr, sizeof(lua_exec_data), MEM_COMMIT, PAGE_READWRITE);
     remote_code = memutil::c_mem::instance()->alloc(nullptr, 0x1000, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-    if (!remote_data || !remote_code) return { 5, std::nullopt };
+    remote_lua_code = memutil::c_mem::instance()->alloc(nullptr, MAX_LUA_CODE_LEN, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    if (!remote_data || !remote_code || !remote_lua_code) return { 5, std::nullopt };
+
+    initialize_execution_data(lua_exec_data, using_core.lua_wrapper.lua_state, (char*)remote_lua_code);
 
     // fill in data & shellcode
     memutil::c_mem::instance()->wpm(remote_data, &lua_exec_data, sizeof(lua_exec_data));
     memutil::c_mem::instance()->wpm(remote_code, &lua_execution_shellcode, 0x1000);
+    // write lua code to allocated buffer
+    memutil::c_mem::instance()->wpm(remote_lua_code, &g_lua_code, MAX_LUA_CODE_LEN);
 
     // start the execution
     HANDLE thread = memutil::c_mem::instance()->create_remote_thread(nullptr, 0, remote_code, remote_data, 0, nullptr);

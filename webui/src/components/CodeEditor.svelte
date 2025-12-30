@@ -1,86 +1,94 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import CodeMirror from 'codemirror';
-  import 'codemirror/mode/lua/lua.js';
-  import 'codemirror/lib/codemirror.css';
-  
+  import { onMount } from "svelte";
+  import CodeMirror from "codemirror";
+  import "codemirror/mode/lua/lua.js";
+  import "codemirror/lib/codemirror.css";
+  import { show_success, show_warning } from "../lib/toast";
+  import { beautify_lua } from "../lib/beautify";
+  import Button from "./Button.svelte";
+
   export let on_execute = async (code) => {};
   export let on_load_file = async () => null;
   export let on_save_file = async (data: String) => null;
+  
   let editor;
   let code_textarea;
-  
+
   onMount(() => {
     setTimeout(() => {
       editor = CodeMirror.fromTextArea(code_textarea, {
-        mode: 'lua',
-        theme: 'custom',
+        mode: "lua",
+        theme: "custom",
         lineNumbers: true,
         indentUnit: 4,
         tabSize: 4,
         indentWithTabs: false,
         lineWrapping: true,
         matchBrackets: true,
-        autoCloseBrackets: true
+        autoCloseBrackets: true,
       });
-      
-      editor.setValue('-- Enter Lua code here...\n\nExplosion(GetPlayerPos(), 1)');
+
+      editor.setValue(
+        "-- Enter Lua code here...\n\nExplosion(GetPlayerPos(), 1)",
+      );
       editor.refresh();
     }, 0);
   });
-  
+
   async function execute() {
     const code = editor.getValue();
     await on_execute(code);
   }
-  
+
   async function load_file() {
     const code = await on_load_file();
     if (code !== null) {
       editor.setValue(code);
     }
   }
-  
+
   async function save_file() {
     const code = await on_save_file(editor.getValue());
   }
 
+  function format_code() {
+    const code = editor.getValue();
+    const result = beautify_lua(code);
+    if (result.error) {
+      show_warning("Failed to parse: " + result.error_message);
+    } else {
+      editor.setValue(result.beautified);
+      show_success("Formatted");
+    }
+  }
+
   function clear_code() {
-    editor.setValue('');
+    editor.setValue("");
   }
 
   async function key_handler(e: KeyboardEvent) {
-    if (e.ctrlKey && e.key === 's') {
-        e.preventDefault();
-        await save_file();
+    if (e.ctrlKey && e.key === "s") {
+      e.preventDefault();
+      await save_file();
     }
   }
 </script>
 
-<svelte:window onkeydown={key_handler}></svelte:window>
+<svelte:window onkeydown={key_handler} />
 
 <div class="flex flex-col h-full w-full">
-  <div class="flex-1 bg-[#141414] rounded-sm p-2 border border-[#252525] mb-4 min-h-0 overflow-hidden">
+  <div
+    class="flex-1 bg-[#141414] rounded-sm p-2 border border-[#252525] mb-4 min-h-0 overflow-hidden"
+  >
     <textarea bind:this={code_textarea}></textarea>
   </div>
 
   <div class="flex gap-3 shrink-0">
-    <button on:click={execute}
-      class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 px-4 rounded-sm">
-      Execute
-    </button>
-    <button on:click={load_file}
-      class="bg-[#1a1a1a] hover:bg-[#252525] text-gray-300 font-medium py-2 px-4 rounded-sm border border-[#252525]">
-      Load File
-    </button>
-        <button on:click={save_file}
-      class="bg-[#1a1a1a] hover:bg-[#252525] text-gray-300 font-medium py-2 px-4 rounded-sm border border-[#252525]">
-      Save
-    </button>
-    <button on:click={clear_code}
-      class="bg-[#1a1a1a] hover:bg-[#252525] text-gray-300 font-medium py-2 px-4 rounded-sm border border-[#252525]">
-      Clear
-    </button>
+    <Button on:click={execute} variant="primary" class="flex-1">Execute</Button>
+    <Button on:click={load_file}>Load File</Button>
+    <Button on:click={save_file}>Save</Button>
+    <Button on:click={format_code}>Format</Button>
+    <Button on:click={clear_code}>Clear</Button>
   </div>
 </div>
 
@@ -89,11 +97,11 @@
     width: 100%;
     height: 100%;
   }
-  
+
   :global(.CodeMirror) {
     height: 100% !important;
     width: 100% !important;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
     font-size: 14px;
     border-radius: 0.25rem;
   }

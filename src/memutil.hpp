@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <string>
 #include <cstdint>
+#include <filesystem>
 
 namespace memutil {
     struct section_info {
@@ -45,6 +46,12 @@ namespace memutil {
             return g_instance;
         }
 
+        bool is_valid_utf8_win(const std::string& str) {
+            if (str.empty()) return true;
+            int result = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, str.c_str(), (int)str.size(), nullptr, 0);
+            return result != 0 || GetLastError() != ERROR_NO_UNICODE_TRANSLATION;
+        }
+
         c_mem() : h(nullptr), pid(0) {}
         c_mem(HANDLE handle, DWORD process_id) : h(handle), pid(process_id) {}
 
@@ -56,6 +63,7 @@ namespace memutil {
         void set_process_id(DWORD _pid) { pid = _pid; }
 
         HANDLE attach(const std::string& application, uint32_t access);
+        std::filesystem::path get_process_path();
 
         bool rpm(uintptr_t addr, void* out, size_t size) const;
         bool wpm(uintptr_t addr, const void* buffer, size_t size) const;

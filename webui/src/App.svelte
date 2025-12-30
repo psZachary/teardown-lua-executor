@@ -6,23 +6,16 @@
   import Home from "./components/Home.svelte";
   import Debug from "./components/Debug.svelte";
   import ScriptView from "./components/ScriptView.svelte";
-  import { show_toast, show_success, show_error, show_info, show_warning } from "./lib/toast"
-
+  import {
+    show_toast,
+    show_success,
+    show_error,
+    show_info,
+    show_warning,
+  } from "./lib/toast";
+  import type { GameStructure, GameScript } from "./lib/game";
   import { Hammer } from "@lucide/svelte";
-  import { SvelteToast } from "@zerodevx/svelte-toast"
-  
-  class GameScript {
-    index: number;
-    path: string;
-    has_client: boolean;
-    has_server: boolean;
-  }
-  class GameStructure {
-    scripts: Array<GameScript>;
-    attached: boolean;
-    attached_message: string;
-    build_type: string;
-  }
+  import { SvelteToast } from "@zerodevx/svelte-toast";
 
   let active_tab: number = 0;
   let game_structure: GameStructure = null;
@@ -31,6 +24,7 @@
   let status_visible: boolean = false;
   let last_statusbar_timeout_id: number = 0;
   let selected_script_index: number = 0;
+  let use_server_core = false;
   // we are using ts-ignore for all errors derived from usage of webview2 setup as it sets up the js environment before loaded
 
   onMount(() => {
@@ -50,8 +44,9 @@
     }
     // @ts-ignore
     if (window.cpp_execute) {
+      console.log(use_server_core)
       // @ts-ignore
-      const result = await window.cpp_execute(code);
+      const result = await window.cpp_execute(code, use_server_core);
       show_toast(
         result.error,
         result.error !== "Success" ? "error" : "success",
@@ -90,13 +85,30 @@
   }
 
   async function update_script_index(index) {
-    selected_script_index = index
+    selected_script_index = index;
     // @ts-ignore
     if (window.cpp_update_script_index) {
       // @ts-ignore
       await window.cpp_update_script_index(parseInt(index));
       show_toast(`Selected script index updated: ${index}`, "info");
     }
+  }
+
+  async function open_file(file_name: string) {
+    // @ts-ignore
+    if (window.cpp_open_file) {
+      // @ts-ignore
+      const result = await window.cpp_open_file(file_name);
+      if (result) {
+        if (result.error !== "Success") {
+          show_toast(result.error, "error");
+          return null;
+        }
+        show_toast("File opened");
+        return result.code;
+      }
+    }
+    return null;
   }
 </script>
 
@@ -121,7 +133,7 @@
         <h1 class="text-2xl font-bold text-white">Teardown Executor</h1>
       </div>
     </div>
-    <h1 class="text-sm">
+    <h1 class="text-sm text-gray-400">
       Teardown Executor - {game_structure?.build_type ?? "Web UI Development"} -
       {game_structure?.attached ? "Attached" : "Not Attached"}
     </h1>
@@ -172,7 +184,7 @@
     {/if}
   </div>
 
-  <div class="flex-1 min-h-0">
+  <div class="flex-1 min-h-0 overflow-auto">
     {#key active_tab}
       {#if active_tab === 0}
         <Home
@@ -191,16 +203,18 @@
         />
       {/if}
       {#if active_tab === 2}
-        <ScriptList
-          scripts={game_structure?.scripts ?? []}
-          {update_script_index}
-        />
+        <ScriptList {game_structure} {update_script_index} />
       {/if}
       {#if active_tab === 3}
-        <ScriptView/>
+        <ScriptView
+          {game_structure}
+          {selected_script_index}
+          on_open_file={open_file}
+          bind:use_server_core={use_server_core}
+        />
       {/if}
       {#if active_tab === 10}
-        <Debug/>
+        <Debug />
       {/if}
     {/key}
   </div>

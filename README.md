@@ -44,16 +44,11 @@ npm install
 teardown-lua-executor/
 ├── webui/                              # Svelte UI
 │   └── src/                            # UI Source
-│       ├── components/                 # UI Components (Tabs)
-│       │   ├── CodeEditor.svelte       # Code editor for the executor
-│       │   ├── Home.svelte             # Home page
-│       │   ├── ScriptList.svelte       # Provides current game scripts via IPC from C++
-│       │   └── StatusBar.svelte        # Status bar
-│       ├── app.css                     # Import TailwindCSS
-│       ├── app.svelte                  # Provides entry point & Webview2 IPC to components
-│       └── main.js 
+│       ├── components/                 # UI Components
+│       └── app.svelte                  # Provides entry point & Webview2 IPC to components
 ├── src/                                # C++ project functionality
 │   └── C++ Backend...
+├── icon/                               # Contains the handmade ICO for the application
 ├── resource/                           # C++ embeddable resources
 │   ├── resource.h
 │   └── resource.rc

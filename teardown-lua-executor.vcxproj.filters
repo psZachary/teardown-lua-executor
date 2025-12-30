@@ -184,6 +184,9 @@
     <ClInclude Include="resource\resource.h">
       <Filter>resource</Filter>
     </ClInclude>
+    <ClInclude Include="src\version.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\file_helper.cpp">

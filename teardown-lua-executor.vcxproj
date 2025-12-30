@@ -212,6 +212,7 @@ npm run build</Command>
     <ClInclude Include="src\lua.hpp" />
     <ClInclude Include="src\lua_shellcode.hpp" />
     <ClInclude Include="src\memutil.hpp" />
+    <ClInclude Include="src\version.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\file_helper.cpp" />

@@ -10,6 +10,7 @@
 #include "file_helper.hpp"
 #include <fstream>
 #include <thread>
+#include "version.hpp"
 
 using namespace memutil;
 using namespace nlohmann;
@@ -77,6 +78,12 @@ static json build_game_structure() {
     result["attached_message"] = !c_mem::instance()->valid() ? "Failed to open process" : (!lua::g_initialized ? "Failed to initialize Lua" : "Unknown");
     result["attached"] = c_mem::instance()->valid() && lua::g_initialized;
     result["build_type"] = (_RELEASE ? "Release" : "Debug");
+    return result;
+}
+
+static json get_build_info() {
+    json result = json::object();
+    result["version"] = VERSION_STRING;
     return result;
 }
 
@@ -176,6 +183,10 @@ int main() {
         return_object["code"] = buf.str();
         
         return return_object.dump();
+    });
+
+    w.bind("cpp_get_build_info", [&](const std::string& req) -> std::string {
+        return get_build_info().dump();
     });
 
     w.bind("cpp_save_file", [&](const std::string& req) -> std::string {

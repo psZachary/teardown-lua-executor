@@ -8,11 +8,12 @@
         Rocket,
         ScrollText,
         FileTerminal,
-        CircleX,
+        History,
         Info,
     } from "@lucide/svelte";
     export let attached: boolean = false;
     export let build_type: string = "";
+    export let build_version: string = null;
     export let script_count: number = 0;
     export let selected_script_index: number = 0;
     export let last_attached_message: string = "Unknown";
@@ -43,8 +44,11 @@
             label="Build"
             value={build_type || "UI Development"}
         />
-
-        <StatCard icon={ScrollText} label="Scripts" value={script_count} />
+        <StatCard
+            icon={History}
+            label="Version"
+            value={build_version || "v0.0.0"}
+        />
     </div>
     <div class="flex flex-row gap-3">
         <StatCard
@@ -52,6 +56,7 @@
             label="Selected Index"
             value={selected_script_index}
         />
+        <StatCard icon={ScrollText} label="Scripts" value={script_count} />
     </div>
     <div class="flex flex-row gap-3">
         <StatCard

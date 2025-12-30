@@ -11,3 +11,7 @@ export interface GameStructure {
     attached_message: string;
     build_type: string;
 }
+
+export interface BuildInfo {
+    version: string;
+}

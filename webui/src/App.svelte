@@ -13,21 +13,19 @@
     show_info,
     show_warning,
   } from "./lib/toast";
-  import type { GameStructure, GameScript } from "./lib/game";
-  import { Hammer } from "@lucide/svelte";
+  import type { GameStructure, BuildInfo } from "./lib/backend";
+  import { Building, Hammer } from "@lucide/svelte";
   import { SvelteToast } from "@zerodevx/svelte-toast";
 
+  let build_info: BuildInfo = null;
   let active_tab: number = 0;
   let game_structure: GameStructure = null;
-  let status_message: string = "";
-  let status_type: string = "success";
-  let status_visible: boolean = false;
-  let last_statusbar_timeout_id: number = 0;
   let selected_script_index: number = 0;
   let use_server_core = false;
-  // we are using ts-ignore for all errors derived from usage of webview2 setup as it sets up the js environment before loaded
 
-  onMount(() => {
+  // we are using ts-ignore for all errors derived from usage of webview2 setup as it sets up the js environment before loaded
+  onMount(async () => {
+    build_info = await get_build_info();
     setInterval(async () => {
       // @ts-ignore
       if (window.cpp_get_game_structure) {
@@ -37,6 +35,15 @@
     }, 150);
   });
 
+  async function get_build_info(): Promise<BuildInfo> {
+    // @ts-ignore
+    if (window.cpp_get_build_info) {
+      // @ts-ignore
+      const result = await window.cpp_get_build_info();
+      return result;
+    }
+  }
+
   async function execute_code(code: String) {
     if (!code.trim()) {
       show_toast("No code to execute", "error");
@@ -44,7 +51,6 @@
     }
     // @ts-ignore
     if (window.cpp_execute) {
-      console.log(use_server_core)
       // @ts-ignore
       const result = await window.cpp_execute(code, use_server_core);
       show_toast(
@@ -134,7 +140,7 @@
       </div>
     </div>
     <h1 class="text-sm text-gray-400">
-      Teardown Executor - {game_structure?.build_type ?? "Web UI Development"} -
+      Teardown Executor - {build_info?.version ?? "v0.0.0"} - {game_structure?.build_type ?? "Web UI Development"} -
       {game_structure?.attached ? "Attached" : "Not Attached"}
     </h1>
   </div>
@@ -193,6 +199,7 @@
           script_count={game_structure?.scripts?.length}
           {selected_script_index}
           last_attached_message={game_structure?.attached_message}
+          build_version={build_info?.version}
         />
       {/if}
       {#if active_tab === 1}

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Check, FileTerminal, X } from "@lucide/svelte";
-    import type { GameStructure } from "../lib/game";
+    import type { GameStructure } from "../lib/backend";
     import Toggle from "./Toggle.svelte";
     import { show_toast } from "../lib/toast";
     import StatCard from "./StatCard.svelte";

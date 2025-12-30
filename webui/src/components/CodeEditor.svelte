@@ -1,8 +1,13 @@
+<script lang="ts" context="module">
+  let saved_code = 
+  `-- Executor created by https://github.com/psZachary
+-- Enter Lua code below:\n\nExplosion(GetPlayerPos(), 1);`
+</script>
+
 <script lang="ts">
-  import { onMount } from "svelte";
-  import CodeMirror from "codemirror";
-  import "codemirror/mode/lua/lua.js";
-  import "codemirror/lib/codemirror.css";
+  import { onMount, onDestroy } from "svelte";
+  import * as monaco from "monaco-editor";
+  import { teardown_api_completions, teardown_func_names } from "../lib/lua_api";
   import { show_success, show_warning } from "../lib/toast";
   import { beautify_lua } from "../lib/beautify";
   import Button from "./Button.svelte";
@@ -11,78 +16,206 @@
   export let on_load_file = async () => null;
   export let on_save_file = async (data: String) => null;
   
-  let editor;
-  let code_textarea;
+  let editor: monaco.editor.IStandaloneCodeEditor;
+  let editor_container: HTMLDivElement;
 
   onMount(() => {
-    setTimeout(() => {
-      editor = CodeMirror.fromTextArea(code_textarea, {
-        mode: "lua",
-        theme: "custom",
-        lineNumbers: true,
-        indentUnit: 4,
-        tabSize: 4,
-        indentWithTabs: false,
-        lineWrapping: true,
-        matchBrackets: true,
-        autoCloseBrackets: true,
-      });
+    monaco.editor.defineTheme("custom-dark", {
+      base: "vs-dark",
+      inherit: true,
+      rules: [
+        { token: "keyword", foreground: "c678dd", fontStyle: "bold" },
+        { token: "string", foreground: "98c379" },
+        { token: "number", foreground: "d19a66" },
+        { token: "comment", foreground: "5c6370", fontStyle: "italic" },
+        { token: "global", foreground: "e5c07b", fontStyle: "bold" },
+        { token: "teardown", foreground: "61afef" },
+        { token: "builtin", foreground: "56b6c2" },
+      ],
+      colors: {
+        "editor.background": "#0a0a0a",
+        "editor.foreground": "#abb2bf",
+        "editor.lineHighlightBackground": "#ffffff08",
+        "editorCursor.foreground": "#528bff",
+        "editor.selectionBackground": "#528bff33",
+        "editorLineNumber.foreground": "#3a3a4a",
+        "editorGutter.background": "#0a0a0a",
+      },
+    });
 
-      editor.setValue(
-        "-- Enter Lua code here...\n\nExplosion(GetPlayerPos(), 1)",
-      );
-      editor.refresh();
-    }, 0);
+    const lua_globals = ["_G", "_VERSION", "self", "math", "string", "table", "io", "os", "debug", "coroutine", "package"];
+    const lua_builtins = ["print", "type", "tostring", "tonumber", "pairs", "ipairs", "next", "select", "unpack", "pack", "pcall", "xpcall", "error", "assert", "setmetatable", "getmetatable", "rawget", "rawset", "rawequal", "rawlen", "require", "loadstring", "loadfile", "dofile", "collectgarbage"];
+
+    monaco.languages.register({ id: "lua" });
+
+    monaco.languages.setMonarchTokensProvider("lua", {
+      teardown_funcs: teardown_func_names,
+      lua_globals,
+      lua_builtins,
+      keywords: ["and", "break", "do", "else", "elseif", "end", "false", "for", "function", "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while"],
+      tokenizer: {
+        root: [
+          [/--\[[\[=]*\[/, "comment", "@comment"],
+          [/--.*$/, "comment"],
+          [/"([^"\\]|\\.)*$/, "string.invalid"],
+          [/'([^'\\]|\\.)*$/, "string.invalid"],
+          [/"/, "string", "@string_double"],
+          [/'/, "string", "@string_single"],
+          [/\[\[/, "string", "@string_multi"],
+          [/\d+(\.\d+)?([eE][-+]?\d+)?/, "number"],
+          [/0[xX][0-9a-fA-F]+/, "number"],
+          [
+            /[a-zA-Z_]\w*/,
+            {
+              cases: {
+                "@teardown_funcs": "teardown",
+                "@lua_globals": "global",
+                "@lua_builtins": "builtin",
+                "@keywords": "keyword",
+                "@default": "identifier",
+              },
+            },
+          ],
+          [/[{}()\[\]]/, "@brackets"],
+          [/[<>]=?|[~=]=|\.\.\.?|[+\-*/%^#]/, "operator"],
+        ],
+        comment: [
+          [/\][\]=]*\]/, "comment", "@pop"],
+          [/./, "comment"],
+        ],
+        string_double: [
+          [/[^\\"]+/, "string"],
+          [/\\./, "string.escape"],
+          [/"/, "string", "@pop"],
+        ],
+        string_single: [
+          [/[^\\']+/, "string"],
+          [/\\./, "string.escape"],
+          [/'/, "string", "@pop"],
+        ],
+        string_multi: [
+          [/\]\]/, "string", "@pop"],
+          [/./, "string"],
+        ],
+      },
+    });
+
+    monaco.languages.registerCompletionItemProvider("lua", {
+      provideCompletionItems: (model, position) => {
+        const word = model.getWordUntilPosition(position);
+        const range = {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endColumn: word.endColumn,
+        };
+
+        const suggestions = [
+          ...teardown_api_completions.map(c => ({
+            label: c.label,
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: c.insertText,
+            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: c.detail,
+            documentation: c.documentation,
+            range,
+          })),
+          ...lua_builtins.map(name => ({
+            label: name,
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: name,
+            range,
+          })),
+          ...lua_globals.map(name => ({
+            label: name,
+            kind: monaco.languages.CompletionItemKind.Variable,
+            insertText: name,
+            range,
+          })),
+          ...["and", "break", "do", "else", "elseif", "end", "false", "for", "function", "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while"].map(kw => ({
+            label: kw,
+            kind: monaco.languages.CompletionItemKind.Keyword,
+            insertText: kw,
+            range,
+          })),
+        ];
+
+        return { suggestions };
+      },
+    });
+
+    editor = monaco.editor.create(editor_container, {
+      value: saved_code,
+      language: "lua",
+      theme: "custom-dark",
+      fontSize: 14,
+      fontFamily: '"JetBrains Mono", "Fira Code", "Consolas", monospace',
+      lineNumbers: "on",
+      minimap: { enabled: false },
+      scrollBeyondLastLine: false,
+      automaticLayout: true,
+      tabSize: 4,
+      insertSpaces: true,
+      wordWrap: "on",
+      bracketPairColorization: { enabled: true },
+      autoClosingBrackets: "always",
+      autoClosingQuotes: "always",
+    });
+
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+      save_file();
+    });
+
+    editor.onDidChangeModelContent(() => {
+      saved_code = editor.getValue();
+    });
+
+    return () => editor.dispose();
   });
 
+  function get_code() {
+    return editor?.getValue() || "";
+  }
+
+  function set_code(code: string) {
+    editor?.setValue(code);
+  }
+
   async function execute() {
-    const code = editor.getValue();
-    await on_execute(code);
+    await on_execute(get_code());
   }
 
   async function load_file() {
     const code = await on_load_file();
     if (code !== null) {
-      editor.setValue(code);
+      set_code(code);
     }
   }
 
   async function save_file() {
-    const code = await on_save_file(editor.getValue());
+    await on_save_file(get_code());
   }
 
   function format_code() {
-    const code = editor.getValue();
-    const result = beautify_lua(code);
+    const result = beautify_lua(get_code());
     if (result.error) {
       show_warning("Failed to parse: " + result.error_message);
     } else {
-      editor.setValue(result.beautified);
+      set_code(result.beautified);
       show_success("Formatted");
     }
   }
 
   function clear_code() {
-    editor.setValue("");
-  }
-
-  async function key_handler(e: KeyboardEvent) {
-    if (e.ctrlKey && e.key === "s") {
-      e.preventDefault();
-      await save_file();
-    }
+    set_code("");
   }
 </script>
 
-<svelte:window onkeydown={key_handler} />
-
 <div class="flex flex-col h-full w-full">
   <div
-    class="flex-1 bg-[#141414] rounded-sm p-2 border border-[#252525] mb-4 min-h-0 overflow-hidden"
-  >
-    <textarea bind:this={code_textarea}></textarea>
-  </div>
-
+    bind:this={editor_container}
+    class="flex-1 rounded-sm border border-[#252525] mb-4 min-h-0 overflow-hidden"
+  ></div>
   <div class="flex gap-3 shrink-0">
     <Button on:click={execute} variant="primary" class="flex-1">Execute</Button>
     <Button on:click={load_file}>Load File</Button>
@@ -91,77 +224,3 @@
     <Button on:click={clear_code}>Clear</Button>
   </div>
 </div>
-
-<style>
-  textarea {
-    width: 100%;
-    height: 100%;
-  }
-
-  :global(.CodeMirror) {
-    height: 100% !important;
-    width: 100% !important;
-    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
-    font-size: 14px;
-    border-radius: 0.25rem;
-  }
-
-  :global(.cm-s-custom.CodeMirror) {
-    background: #0a0a0a;
-    color: #abb2bf;
-    line-height: 1.6;
-  }
-
-  :global(.cm-s-custom .CodeMirror-gutters) {
-    background: #0a0a0a;
-    border-right: 1px solid #1a1a1a;
-  }
-
-  :global(.cm-s-custom .CodeMirror-linenumber) {
-    color: #3a3a4a;
-    padding: 0 12px 0 8px;
-  }
-
-  :global(.cm-s-custom .CodeMirror-cursor) {
-    border-left: 2px solid #528bff;
-  }
-
-  :global(.cm-s-custom .CodeMirror-selected) {
-    background: rgba(82, 139, 255, 0.2);
-  }
-
-  :global(.cm-s-custom .CodeMirror-activeline-background) {
-    background: rgba(255, 255, 255, 0.03);
-  }
-
-  :global(.cm-s-custom .cm-keyword) {
-    color: #c678dd;
-    font-weight: 500;
-  }
-
-  :global(.cm-s-custom .cm-string) {
-    color: #98c379;
-  }
-
-  :global(.cm-s-custom .cm-number) {
-    color: #d19a66;
-  }
-
-  :global(.cm-s-custom .cm-comment) {
-    color: #5c6370;
-    font-style: italic;
-  }
-
-  :global(.cm-s-custom .cm-builtin) {
-    color: #61afef;
-    font-weight: 500;
-  }
-
-  :global(.cm-s-custom .cm-variable) {
-    color: #e06c75;
-  }
-
-  :global(.cm-s-custom .cm-operator) {
-    color: #56b6c2;
-  }
-</style>

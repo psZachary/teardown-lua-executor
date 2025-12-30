@@ -101,6 +101,8 @@
 
   async function update_script_index(index) {
     selected_script_index = index;
+    // disable by default!
+    use_server_core = false;
     // @ts-ignore
     if (window.cpp_update_script_index) {
       // @ts-ignore

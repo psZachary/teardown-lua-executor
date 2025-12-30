@@ -118,7 +118,9 @@
   }
 </script>
 
-<svelte:head></svelte:head>
+<svelte:head>
+  <link rel="icon" href="data:," />
+</svelte:head>
 
 <svelte:window on:contextmenu|preventDefault />
 

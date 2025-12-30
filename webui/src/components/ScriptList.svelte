@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { GameStructure, GameScript } from "../lib/game";
+  import type { GameStructure, GameScript } from "../lib/backend";
   import { X } from "@lucide/svelte";
   import StatCard from "./StatCard.svelte";
   

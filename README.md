@@ -1,6 +1,6 @@
 # Teardown Lua Executor
 
-External Lua executor for the Teardown game using shellcode injection with a modern WebView2 UI built in Svelte, TailwindCSS, and CodeMirror.
+External Lua executor for the Teardown game using shellcode injection with a modern WebView2 UI built in Svelte, TailwindCSS, and Monaco.
 
 ## Features
 
@@ -89,7 +89,7 @@ The output in `webui/dist/index.html` will be embedded as a resource during the 
 - **Injection Method**: Shellcode injection
 - **UI Framework**: Svelte 5
 - **Styling**: TailwindCSS 4
-- **Code Editor**: CodeMirror 5 with Lua syntax highlighting
+- **Code Editor**: Monaco with Lua syntax highlighting
 - **Build Tool**: Vite with single-file plugin
 - **WebView**: Microsoft WebView2
 
